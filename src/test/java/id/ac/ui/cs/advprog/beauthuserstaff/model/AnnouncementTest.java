@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.model;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,9 +16,8 @@ public class AnnouncementTest {
 
     @BeforeEach
     void setUp(){
-        this.announcement = new Announcement();
-        this.announcement.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        this.announcement.setContent("Selamat pagi");
+        this.announcement = new Announcement("eb558e9f-1c39-460e-8860-71af6af63bd6",
+                                          "Selamat pagi");
     }
 
     @Test

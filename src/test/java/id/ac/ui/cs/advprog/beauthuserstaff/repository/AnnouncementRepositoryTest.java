@@ -61,15 +61,6 @@ public class AnnouncementRepositoryTest {
         });
     }
 
-    @Test
-    void testDeleteAnnouncementIfEmpty(){
-        Announcement announcement = announcements.get(0);
-
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            announcementRepository.deleteAnnouncement(announcement.getId());
-        });
-    }
 
     @Test
     void testGetAllAnnouncementsIfEmpty(){

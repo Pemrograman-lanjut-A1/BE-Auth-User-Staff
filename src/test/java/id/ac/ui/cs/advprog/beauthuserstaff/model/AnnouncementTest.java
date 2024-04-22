@@ -1,0 +1,32 @@
+package id.ac.ui.cs.advprog.beauthuserstaff.model;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class AnnouncementTest {
+    private Announcement announcement;
+
+    @BeforeEach
+    void setUp(){
+        this.announcement = new Announcement();
+        this.announcement.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        this.announcement.setContent("Selamat pagi");
+    }
+
+    @Test
+    void testGetId(){
+        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", this.announcement.getId());
+    }
+
+    @Test
+    void testGetContent(){
+        assertEquals("Selamat pagi", this.announcement.getContent());
+    }
+}

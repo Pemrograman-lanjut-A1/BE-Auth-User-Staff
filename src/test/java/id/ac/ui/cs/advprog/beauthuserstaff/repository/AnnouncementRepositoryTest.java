@@ -55,8 +55,10 @@ public class AnnouncementRepositoryTest {
         Announcement announcement = announcements.get(0);
         announcementRepository.addAnnouncement(announcement);
         announcementRepository.deleteAnnouncement(announcement.getId());
-        Announcement foundAnnouncement = announcementRepository.getAnnouncement(announcement.getId());
-        assertNull(foundAnnouncement);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            Announcement foundAnnouncement = announcementRepository.getAnnouncement(announcement.getId());
+        });
     }
 
     @Test

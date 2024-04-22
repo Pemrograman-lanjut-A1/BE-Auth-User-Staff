@@ -28,7 +28,7 @@ public class AnnouncementRepositoryTest {
     }
 
     @Test
-    void testAddAnnouncement(){
+    void testAddAndGetAnnouncement(){
         Announcement announcement = announcements.get(0);
         Announcement result = announcementRepository.addAnnouncement(announcement);
 
@@ -37,6 +37,17 @@ public class AnnouncementRepositoryTest {
         assertEquals(announcement.getContent(), result.getContent());
         assertEquals(announcement.getId(), findResult.getId());
         assertEquals(announcement.getContent(), findResult.getContent());
+    }
+
+    @Test
+    void testGetAnnouncementIfInvalidId(){
+        Announcement announcement = announcements.get(0);
+        Announcement result = announcementRepository.addAnnouncement(announcement);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            Announcement findResult = announcementRepository.getAnnouncement((announcements.get(1).getId()));
+        });
+
     }
 
     @Test

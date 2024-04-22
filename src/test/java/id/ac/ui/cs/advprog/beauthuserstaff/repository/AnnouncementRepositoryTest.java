@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.repository;
 
-import import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -71,7 +71,7 @@ public class AnnouncementRepositoryTest {
 
     @Test
     void testGetAllAnnouncementsIfEmpty(){
-        Iterator<Announcement> announcementIterator = announcementRepository.getAnnouncements();
+        Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();
         assertFalse(announcementIterator.hasNext());
     }
 

@@ -57,7 +57,13 @@ public class AnnouncementControllerTest {
 
     @Test
     void testGetAllAnnouncements(){
-        announcementController.getAllAnnouncements();
-        verify(announcementService, times(1)).getAllAnnouncements();
+        announcementController.createAnnouncement("hello");
+        announcementController.createAnnouncement("world");
+        List<Announcement> announcements = announcementController.getAllAnnouncements();
+        Announcement announcement1 = announcements.get(0);
+        assertEquals("hello", announcement1.getContent());
+        Announcement announcement2 = announcements.get(1);
+        assertEquals("world", announcement2.getContent());
+
     }
 }

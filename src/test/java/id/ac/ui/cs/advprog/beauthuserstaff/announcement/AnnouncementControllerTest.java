@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.announcement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController.AnnouncementController;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
@@ -58,8 +59,9 @@ public class AnnouncementControllerTest {
         assertTrue(result.isEmpty());
     }
 
+
     @Test
-    void testGetAllAnnouncements() throws JSONException {
+    void testGetAllAnnouncements() throws JsonProcessingException, JSONException, org.springframework.boot.configurationprocessor.json.JSONException {
         announcementController.createAnnouncement("hello");
         announcementController.createAnnouncement("world");
         String announcements = announcementController.getAllAnnouncements();

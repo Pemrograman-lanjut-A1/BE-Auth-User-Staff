@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -19,14 +20,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 public class AnnouncementServiceImplTest {
+
+
     AnnouncementServiceImpl announcementService;
     List<Announcement> announcements;
+
     AnnouncementRepository announcementRepository;
 
     @BeforeEach
     void setUp(){
         announcements = new ArrayList<>();
+        announcementRepository = new AnnouncementRepository();
+        announcementService = new AnnouncementServiceImpl();
+
+        ReflectionTestUtils.setField(announcementService, "announcementRepository", announcementRepository);
+
         Announcement announcement1 = new Announcement("id-1", "Selamat pagi");
         announcements.add(announcement1);
         Announcement announcement2 = new Announcement("id-2", "Selamat siang");
@@ -36,6 +46,7 @@ public class AnnouncementServiceImplTest {
     @Test
     void testCreateAnnouncement(){
         Announcement announcement = announcements.get(1);
+        System.out.println(announcementRepository);
         announcementService.createAnnouncement(announcement);
 
         Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();

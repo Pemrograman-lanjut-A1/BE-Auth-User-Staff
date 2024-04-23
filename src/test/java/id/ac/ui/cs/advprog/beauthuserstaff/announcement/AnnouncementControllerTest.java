@@ -5,6 +5,9 @@ import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementServiceImpl;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,14 +59,14 @@ public class AnnouncementControllerTest {
     }
 
     @Test
-    void testGetAllAnnouncements(){
+    void testGetAllAnnouncements() throws JSONException {
         announcementController.createAnnouncement("hello");
         announcementController.createAnnouncement("world");
-        List<Announcement> announcements = announcementController.getAllAnnouncements();
-        Announcement announcement1 = announcements.get(0);
-        assertEquals("hello", announcement1.getContent());
-        Announcement announcement2 = announcements.get(1);
-        assertEquals("world", announcement2.getContent());
-
+        String announcements = announcementController.getAllAnnouncements();
+        JSONArray jsonArray = new JSONArray(announcements);
+        JSONObject announcementJson1 = jsonArray.getJSONObject(0);
+        JSONObject announcementJson2 = jsonArray.getJSONObject(1);
+        assertEquals("hello", announcementJson1.getString("content"));
+        assertEquals("world", announcementJson2.getString("content"));
     }
 }

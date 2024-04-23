@@ -33,19 +33,24 @@ public class AnnouncementControllerTest {
 
     @Test
     void testCreateAnnouncement(){
-        announcementController.createAnnouncement("id-1", "hello");
-        Announcement result = announcementService.getAllAnnouncements().getFirst();
-        assertEquals(result.getId(), "id-1");
-        assertEquals(result.getContent(), "hello");
+        announcementController.createAnnouncement( "hello");
+        List<Announcement> resultList = announcementService.getAllAnnouncements();
+        assertEquals(resultList.size(), 1);
+
+        Announcement resultAnnouncement = resultList.getFirst();
+        assertEquals(resultAnnouncement.getContent(), "hello");
     }
 
     @Test
     void testDeleteAnnouncement(){
-        announcementController.createAnnouncement("id-1", "hello");
-        List<Announcement> temp = announcementService.getAllAnnouncements();
-        assertEquals(temp.size(), 1);
+        announcementController.createAnnouncement("hello");
+        List<Announcement> tempList = announcementService.getAllAnnouncements();
+        assertEquals(tempList.size(), 1);
 
-        announcementController.deleteAnnouncement("id-1");
+        Announcement tempAnnouncement = tempList.getFirst();
+        String tempId = tempAnnouncement.getId();
+
+        announcementController.deleteAnnouncement(tempId);
         List<Announcement> result = announcementService.getAllAnnouncements();
         assertTrue(result.isEmpty());
     }

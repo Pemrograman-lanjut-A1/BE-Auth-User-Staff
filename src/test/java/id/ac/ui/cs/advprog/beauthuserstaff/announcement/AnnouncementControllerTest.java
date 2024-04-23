@@ -36,20 +36,20 @@ public class AnnouncementControllerTest {
     }
 
     @Test
-    void testCreateAnnouncement(){
-        announcementController.createAnnouncement( "hello");
+    void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
+        announcementController.createAnnouncement( "{\"content\":\"hello\"}");
         List<Announcement> resultList = announcementService.getAllAnnouncements();
-        assertEquals(resultList.size(), 1);
+        assertEquals(1, resultList.size());
 
         Announcement resultAnnouncement = resultList.getFirst();
-        assertEquals(resultAnnouncement.getContent(), "hello");
+        assertEquals("hello", resultAnnouncement.getContent());
     }
 
     @Test
-    void testDeleteAnnouncement(){
-        announcementController.createAnnouncement("hello");
+    void testDeleteAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
+        announcementController.createAnnouncement("{\"content\":\"hello\"}");
         List<Announcement> tempList = announcementService.getAllAnnouncements();
-        assertEquals(tempList.size(), 1);
+        assertEquals(1, tempList.size());
 
         Announcement tempAnnouncement = tempList.getFirst();
         String tempId = tempAnnouncement.getId();
@@ -62,8 +62,8 @@ public class AnnouncementControllerTest {
 
     @Test
     void testGetAllAnnouncements() throws JsonProcessingException, JSONException, org.springframework.boot.configurationprocessor.json.JSONException {
-        announcementController.createAnnouncement("hello");
-        announcementController.createAnnouncement("world");
+        announcementController.createAnnouncement("{\"content\":\"hello\"}");
+        announcementController.createAnnouncement("{\"content\":\"world\"}");
         String announcements = announcementController.getAllAnnouncements();
         JSONArray jsonArray = new JSONArray(announcements);
         JSONObject announcementJson1 = jsonArray.getJSONObject(0);

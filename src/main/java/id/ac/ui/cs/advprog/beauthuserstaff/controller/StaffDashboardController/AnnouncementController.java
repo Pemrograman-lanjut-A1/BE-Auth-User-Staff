@@ -1,7 +1,12 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +33,10 @@ public class AnnouncementController {
     }
 
     @GetMapping("/get-all-announcements")
-    public List<Announcement> getAllAnnouncements(){
-        return(announcementService.getAllAnnouncements());
+    public String getAllAnnouncements() throws JsonProcessingException, JSONException {
+        List<Announcement> announcementList = announcementService.getAllAnnouncements();
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        return ow.writeValueAsString(announcementList);
     }
 
 

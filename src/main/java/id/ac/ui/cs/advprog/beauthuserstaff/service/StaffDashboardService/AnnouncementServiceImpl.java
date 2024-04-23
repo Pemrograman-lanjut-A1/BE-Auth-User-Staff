@@ -1,21 +1,23 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService;
 
+import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService{
     @Override
-    public String createAnnouncement() {
-        return "create announcement";
+    public Announcement createAnnouncement(Announcement announcement) {
+        return null;
     }
 
     @Override
-    public String deleteAnnouncement() {
-        return "delete announcement";
+    public void deleteAnnouncement(String string) {
     }
 
     @Override
-    public String getAllAnnouncements() {
-        return "get all announcements";
+    public List<Announcement> getAllAnnouncements() {
+        return null;
     }
 }

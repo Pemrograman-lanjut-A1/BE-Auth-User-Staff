@@ -1,9 +1,13 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService;
 
+import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+
+import java.util.List;
+
 public interface AnnouncementService {
-    public String createAnnouncement();
+    public Announcement createAnnouncement(Announcement announcement);
 
-    public String deleteAnnouncement();
+    public void deleteAnnouncement(String id);
 
-    public String getAllAnnouncements();
+    public List<Announcement> getAllAnnouncements();
 }

@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.Announc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,11 @@ public class AnnouncementController {
     AnnouncementService announcementService;
 
     @PostMapping("/create-announcement")
-    public String createAnnouncement(String content){
+    public String createAnnouncement(@RequestBody String jsonContent) throws JSONException {
+        System.out.println(jsonContent);
+        JSONObject jsonObject = new JSONObject(jsonContent);
+        String content = jsonObject.getString("content");
+
         Announcement newAnnouncement = new Announcement(null, content);
         announcementService.createAnnouncement(newAnnouncement);
         return "200";

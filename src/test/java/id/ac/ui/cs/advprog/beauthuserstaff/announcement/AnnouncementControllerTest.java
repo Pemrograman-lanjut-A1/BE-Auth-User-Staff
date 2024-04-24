@@ -53,8 +53,9 @@ public class AnnouncementControllerTest {
 
         Announcement tempAnnouncement = tempList.getFirst();
         String tempId = tempAnnouncement.getId();
+        String jsonId = "{\"id\":\"" + tempId + "\"}";
 
-        announcementController.deleteAnnouncement(tempId);
+        announcementController.deleteAnnouncement(jsonId);
         List<Announcement> result = announcementService.getAllAnnouncements();
         assertTrue(result.isEmpty());
     }

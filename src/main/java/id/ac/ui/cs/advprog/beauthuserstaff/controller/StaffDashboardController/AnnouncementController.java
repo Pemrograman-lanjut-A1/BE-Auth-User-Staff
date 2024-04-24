@@ -25,14 +25,16 @@ public class AnnouncementController {
         System.out.println(jsonContent);
         JSONObject jsonObject = new JSONObject(jsonContent);
         String content = jsonObject.getString("content");
-
         Announcement newAnnouncement = new Announcement(null, content);
         announcementService.createAnnouncement(newAnnouncement);
         return "200";
     }
 
     @PostMapping("/delete-announcement")
-    public String deleteAnnouncement(String id){
+    public String deleteAnnouncement(@RequestBody String jsonId) throws JSONException{
+        System.out.println(jsonId);
+        JSONObject jsonObject = new JSONObject(jsonId);
+        String id = jsonObject.getString("id");
         announcementService.deleteAnnouncement(id);
         return "200";
     }

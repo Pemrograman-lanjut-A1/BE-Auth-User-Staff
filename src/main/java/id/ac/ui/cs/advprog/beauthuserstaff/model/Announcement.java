@@ -1,13 +1,17 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.model;
 
-
+import jakarta.persistence.*;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor
+@Entity(name = "announcement")
 public class Announcement {
+    @Id
     String id;
     String content;
 

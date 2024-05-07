@@ -4,12 +4,15 @@ import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementServiceImpl;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -17,22 +20,31 @@ import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 
+@ExtendWith(MockitoExtension.class)
 public class AnnouncementServiceImplTest {
 
 
+    @InjectMocks
     AnnouncementServiceImpl announcementService;
+
+
     List<Announcement> announcements;
 
+    @Mock
     AnnouncementRepository announcementRepository;
 
     @BeforeEach
     void setUp(){
+        MockitoAnnotations.initMocks(this);
         announcements = new ArrayList<>();
-        announcementRepository = new AnnouncementRepository();
         announcementService = new AnnouncementServiceImpl();
 
         ReflectionTestUtils.setField(announcementService, "announcementRepository", announcementRepository);
@@ -45,42 +57,42 @@ public class AnnouncementServiceImplTest {
 
     @Test
     void testCreateAnnouncement(){
-        Announcement announcement = announcements.get(1);
-        System.out.println(announcementRepository);
-        announcementService.createAnnouncement(announcement);
 
-        Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();
-        assertTrue(announcementIterator.hasNext());
-        Announcement savedAnnouncement = announcementIterator.next();
-        assertEquals(announcement.getId(), savedAnnouncement.getId());
-        assertEquals(announcement.getContent(), savedAnnouncement.getContent());
+
+        Announcement announcement = announcements.get(1);
+
+
+        when(announcementRepository.addAnnouncement(any(Announcement.class))).thenReturn(announcement);
+
+        Announcement createdAnnouncement = announcementService.createAnnouncement(announcement);
+
+        assertNotNull(createdAnnouncement);
+        assertEquals(announcement.getId(), createdAnnouncement.getId());
+        assertEquals(announcement.getContent(), createdAnnouncement.getContent());
     }
 
     @Test
     void testDeleteAnnouncement(){
         Announcement announcement = announcements.get(1);
-        announcementService.createAnnouncement(announcement);
-        announcementService.deleteAnnouncement(announcement.getId());
+        String id = announcement.getId();
+        announcementService.deleteAnnouncement(id);
 
-        Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();
-        assertFalse(announcementIterator.hasNext());
+        verify(announcementRepository, times(1)).deleteAnnouncement(id);
     }
 
     @Test
     void testGetAllAnnouncements() {
-        for (Announcement announcement : announcements) {
-            announcementService.createAnnouncement(announcement);
-        }
-        List<Announcement> announcementsResult = announcementService.getAllAnnouncements();
+        List<Announcement> expectedAnnouncements = new ArrayList<>();
+        expectedAnnouncements.add(new Announcement());
+        expectedAnnouncements.add(new Announcement());
+        expectedAnnouncements.add(new Announcement());
+        CompletableFuture<List<Announcement>> completedFuture = CompletableFuture.completedFuture(expectedAnnouncements);
+        when(announcementRepository.getAllAnnouncements()).thenReturn(expectedAnnouncements);
 
-        for (Announcement announcement : announcements) {
-            assertTrue(announcementsResult.contains(announcement));
-        }
+        List<Announcement> foundAnnouncements = announcementService.getAllAnnouncements();
+
+        assertNotNull(foundAnnouncements);
+        assertEquals(expectedAnnouncements.size(), foundAnnouncements.size());
+        assertEquals(expectedAnnouncements, foundAnnouncements);
     }
-
-
-
-
-
-
 }

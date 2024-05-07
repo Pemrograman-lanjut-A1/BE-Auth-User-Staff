@@ -45,6 +45,4 @@ public class AnnouncementController {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         return ow.writeValueAsString(announcementList);
     }
-
-
 }

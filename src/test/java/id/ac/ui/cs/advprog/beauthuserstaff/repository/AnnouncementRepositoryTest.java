@@ -1,24 +1,45 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.repository;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 public class AnnouncementRepositoryTest {
+
+    @InjectMocks
     AnnouncementRepository announcementRepository;
+
+    @Mock
+    EntityManager entityManager;
+
 
     List<Announcement> announcements;
     @BeforeEach
     void setUp(){
-        announcementRepository = new AnnouncementRepository();
 
+        MockitoAnnotations.openMocks(this);
+        announcementRepository = new AnnouncementRepository();
         announcements = new ArrayList<>();
+        
+
+        ReflectionTestUtils.setField(announcementRepository, "entityManager", entityManager);
 
         Announcement announcement1 = new Announcement("id-1", "Selamat pagi");
         Announcement announcement2 = new Announcement("id-2", "Selamat siang");
@@ -30,6 +51,7 @@ public class AnnouncementRepositoryTest {
     @Test
     void testAddAndGetAnnouncement(){
         Announcement announcement = announcements.get(0);
+        when(entityManager.find(eq(Announcement.class), any())).thenReturn(announcement);
         Announcement result = announcementRepository.addAnnouncement(announcement);
 
         Announcement findResult = announcementRepository.getAnnouncement(announcements.get(0).getId());
@@ -37,51 +59,48 @@ public class AnnouncementRepositoryTest {
         assertEquals(announcement.getContent(), result.getContent());
         assertEquals(announcement.getId(), findResult.getId());
         assertEquals(announcement.getContent(), findResult.getContent());
+        verify(entityManager, times(1)).find(eq(Announcement.class), any());
     }
 
     @Test
     void testGetAnnouncementIfInvalidId(){
-        Announcement announcement = announcements.get(0);
-        Announcement result = announcementRepository.addAnnouncement(announcement);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            Announcement findResult = announcementRepository.getAnnouncement((announcements.get(1).getId()));
-        });
-
+        when(entityManager.find(eq(Announcement.class), any())).thenReturn(null);
+        assertNull(announcementRepository.getAnnouncement("123"));
     }
 
     @Test
     void testDeleteAnnouncement(){
-        Announcement announcement = announcements.get(0);
-        announcementRepository.addAnnouncement(announcement);
-        announcementRepository.deleteAnnouncement(announcement.getId());
+        Query query = mock(Query.class);
+        when(entityManager.createQuery(anyString())).thenReturn(query);
+        doReturn(query).when(query).setParameter(anyString(), any());
+        when(query.executeUpdate()).thenReturn(1);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            Announcement foundAnnouncement = announcementRepository.getAnnouncement(announcement.getId());
-        });
+        announcementRepository.deleteAnnouncement("123");
+
+        verify(entityManager, Mockito.times(1)).createQuery(anyString());
+        verify(query, Mockito.times(1)).setParameter(anyString(), any());
+        verify(query, Mockito.times(1)).executeUpdate();
+//        Announcement announcement = announcements.get(0);
+//        announcementRepository.addAnnouncement(announcement);
+//        announcementRepository.deleteAnnouncement(announcement.getId());
+//
+//        assertThrows(IllegalArgumentException.class, () -> {
+//            Announcement foundAnnouncement = announcementRepository.getAnnouncement(announcement.getId());
+//        });
     }
 
 
     @Test
     void testGetAllAnnouncementsIfEmpty(){
-        Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();
-        assertFalse(announcementIterator.hasNext());
-    }
+        List<Announcement> expectedAnnouncements = Collections.emptyList();
+        TypedQuery<Announcement> typedQuery = mock(TypedQuery.class);
+        when(entityManager.createQuery(anyString(), eq(Announcement.class))).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(expectedAnnouncements);
 
-    @Test
-    void testGetAllAnnouncementsIfMoreThanOne(){
-        int i = 0;
-        for (Announcement announcement : announcements){
-            announcementRepository.addAnnouncement(announcement);
-            i += 1;
-        }
+        List<Announcement> foundTopUps = announcementRepository.getAllAnnouncements();
 
-        Iterator<Announcement> announcementIterator = announcementRepository.getAllAnnouncements();
-        assertTrue(announcementIterator.hasNext());
-        Announcement savedAnnouncement = announcementIterator.next();
-        assertEquals(announcements.getFirst().getId(), savedAnnouncement.getId());
-        savedAnnouncement = announcementIterator.next();
-        assertEquals(announcements.get(1).getId(), savedAnnouncement.getId());
-        assertFalse(announcementIterator.hasNext());
+        assertEquals(expectedAnnouncements, foundTopUps);
+        verify(entityManager, Mockito.times(1)).createQuery(anyString(), eq(Announcement.class));
+        verify(typedQuery, Mockito.times(1)).getResultList();
     }
 }

@@ -75,14 +75,11 @@ class AuthResponseUtilTest {
 
     @Test
     void generateUserLoginResponse_NullUser_ShouldReturnUnauthorizedResponse() throws ExecutionException, JsonProcessingException, InterruptedException {
-        // Prepare null user and mock JWT service
         User user = null;
         JWTservice jwtService = mock(JWTservice.class);
 
-        // Generate response
         ResponseEntity<Object> response = AuthResponseUtil.generateUserLoginResponse(user, jwtService);
 
-        // Assertion
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         Map<String, Object> responseData = (Map<String, Object>) response.getBody();
         assertEquals("Maaf username atau password tidak sesuai", responseData.get("message"));

@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.enums.UserType;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,8 +30,7 @@ public class SecurityConfigurations {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/auth/**")
                         .permitAll()
-                        .requestMatchers("/api/v1/staff").hasAuthority(UserType.STAFF.name())
-                        .requestMatchers("/api/v1/user").hasAuthority(UserType.REGULAR.name())
+                        .requestMatchers("/staff").hasAuthority(UserType.STAFF.name())
                         .anyRequest().authenticated())
 
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

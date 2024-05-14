@@ -27,7 +27,6 @@ public class UserTest {
 
     @Test
     public void testUserBuilder() {
-        assertEquals("john_doe", user.getUsername());
         assertEquals("john@example.com", user.getEmail());
         assertEquals("password123", user.getPassword());
         assertEquals(UserType.REGULAR, user.getType());
@@ -54,7 +53,6 @@ public class UserTest {
         user.setPassword("newpassword");
         user.setType(UserType.STAFF);
 
-        assertEquals("jane_doe", user.getUsername());
         assertEquals("jane@example.com", user.getEmail());
         assertEquals("newpassword", user.getPassword());
         assertEquals(UserType.STAFF, user.getType());

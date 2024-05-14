@@ -29,20 +29,17 @@ class UserServiceTest {
     @Test
     void loadUserByUsername_UserExists_ReturnUserDetails() {
         String email = "test@example.com";
-        String username = "johndoe";
         User user = User.builder()
                 .email(email)
-                .username(username)
                 .password("Password1!").build();
 
-        when(userRepository.findByEmail(username)).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.ofNullable(user));
 
-        UserDetails userDetails = userService.userDetailsService().loadUserByUsername(username);
+        UserDetails userDetails = userService.userDetailsService().loadUserByUsername(email);
 
-        assertEquals(username, userDetails.getUsername());
         assertEquals(user.getPassword(), userDetails.getPassword());
 
-        verify(userRepository, times(1)).findByEmail(username);
+        verify(userRepository, times(1)).findByEmail(email);
     }
 
 

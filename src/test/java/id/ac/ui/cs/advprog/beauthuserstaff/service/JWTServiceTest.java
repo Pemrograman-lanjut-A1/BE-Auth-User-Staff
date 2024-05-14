@@ -66,7 +66,7 @@ class JWTServiceTest {
         user.setUserid(userId);
         user.setType(UserType.valueOf(userType));
 
-        when(userRepository.findUserByUsername(userDetails.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(userDetails.getUsername())).thenReturn(Optional.of(user));
 
         CompletableFuture<String> tokenFuture = jwtService.generateToken(userDetails);
 
@@ -80,7 +80,7 @@ class JWTServiceTest {
         String username = "test";
         UserDetails userDetails = new User(username, "password", new ArrayList<>());
 
-        when(userRepository.findUserByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(username)).thenReturn(Optional.empty());
 
         CompletableFuture<String> tokenFuture = jwtService.generateToken(userDetails);
 

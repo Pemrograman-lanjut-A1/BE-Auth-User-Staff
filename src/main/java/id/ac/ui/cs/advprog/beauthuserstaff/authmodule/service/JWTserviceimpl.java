@@ -37,7 +37,7 @@ public class JWTserviceimpl implements JWTservice {
     @Override
     @Async
     public CompletableFuture<String> generateToken(UserDetails userDetails) {
-        Optional<User> userOptional = userRepository.findUserByUsername(userDetails.getUsername());
+        Optional<User> userOptional = userRepository.findByEmail(userDetails.getUsername());
         if (userOptional.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }

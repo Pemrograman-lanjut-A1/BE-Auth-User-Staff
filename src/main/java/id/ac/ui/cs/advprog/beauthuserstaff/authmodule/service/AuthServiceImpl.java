@@ -96,6 +96,7 @@ public class AuthServiceImpl implements AuthService{
             if (!isPasswordValid(signUpRequest.getPassword())) {
                 return generateSignUpError();
             }
+            String id = String.valueOf(UUID.randomUUID());
             User user = User.builder()
                     .email(signUpRequest.getEmail())
                     .username(signUpRequest.getUsername())
@@ -103,8 +104,8 @@ public class AuthServiceImpl implements AuthService{
                     .type(UserType.STAFF)
                     .build();
 
+            user.setUserid(id);
             userRepository.save(user);
-
             return generateUserSignUpResponse(user);
         }catch (DataIntegrityViolationException e) {
             return ResponseHandler.generateResponse(

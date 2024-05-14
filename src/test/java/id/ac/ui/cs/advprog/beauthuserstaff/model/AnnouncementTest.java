@@ -16,8 +16,8 @@ public class AnnouncementTest {
 
     @BeforeEach
     void setUp(){
-        this.announcement = new Announcement("eb558e9f-1c39-460e-8860-71af6af63bd6",
-                                          "Selamat pagi");
+        this.announcement = new AnnouncementBuilder().id("eb558e9f-1c39-460e-8860-71af6af63bd6").content(
+                                          "Selamat pagi").tag("TagTest").build();
     }
 
     @Test
@@ -29,4 +29,11 @@ public class AnnouncementTest {
     void testGetContent(){
         assertEquals("Selamat pagi", this.announcement.getContent());
     }
+
+    @Test
+    void testGetTag(){
+        assertEquals("TagTest", this.announcement.getTag());
+    }
+
 }
+

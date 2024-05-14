@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.service;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementServiceImpl;
@@ -49,9 +50,9 @@ public class AnnouncementServiceImplTest {
 
         ReflectionTestUtils.setField(announcementService, "announcementRepository", announcementRepository);
 
-        Announcement announcement1 = new Announcement("id-1", "Selamat pagi");
+        Announcement announcement1 = new AnnouncementBuilder().id("id-1").content("Selamat pagi").build();
         announcements.add(announcement1);
-        Announcement announcement2 = new Announcement("id-2", "Selamat siang");
+        Announcement announcement2 = new AnnouncementBuilder().id("id-2").content("Selamat pagi").build();
         announcements.add(announcement2);
     }
 

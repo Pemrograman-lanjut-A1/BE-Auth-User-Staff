@@ -3,6 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
@@ -25,7 +26,8 @@ public class AnnouncementController {
         System.out.println(jsonContent);
         JSONObject jsonObject = new JSONObject(jsonContent);
         String content = jsonObject.getString("content");
-        Announcement newAnnouncement = new Announcement(null, content);
+        String tag = jsonObject.getString("tag");
+        Announcement newAnnouncement = new AnnouncementBuilder().content(content).tag(tag).build();
         announcementService.createAnnouncement(newAnnouncement);
         return "200";
     }

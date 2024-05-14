@@ -46,7 +46,7 @@ public class AnnouncementControllerTest {
 
     @Test
     void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
-        Announcement announcement = new Announcement("1", "{\"content\":\"hello\"}");
+        Announcement announcement = new Announcement("1", "{\"content\":\"hello\"}",null);
         when(announcementService.createAnnouncement(any())).thenReturn(announcement);
         announcementController.createAnnouncement( "{\"content\":\"hello\"}");
         verify(announcementService, times(1)).createAnnouncement(any());

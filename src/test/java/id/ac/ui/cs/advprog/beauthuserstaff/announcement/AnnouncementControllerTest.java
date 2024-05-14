@@ -46,9 +46,9 @@ public class AnnouncementControllerTest {
 
     @Test
     void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
-        Announcement announcement = new Announcement("1", "{\"content\":\"hello\"}",null);
+        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
         when(announcementService.createAnnouncement(any())).thenReturn(announcement);
-        announcementController.createAnnouncement( "{\"content\":\"hello\"}");
+        announcementController.createAnnouncement( "{\"content\":\"hello\", \"tag\": \"TagTest\" }");
         verify(announcementService, times(1)).createAnnouncement(any());
     }
 

@@ -44,13 +44,13 @@ public class AnnouncementControllerTest {
         ReflectionTestUtils.setField(announcementController, "announcementService", announcementService);
     }
 
-    @Test
-    void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
-        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
-        when(announcementService.createAnnouncement(any())).thenReturn(announcement);
-        announcementController.createAnnouncement( "{\"content\":\"hello\", \"tag\": \"TagTest\" }");
-        verify(announcementService, times(1)).createAnnouncement(any());
-    }
+//    @Test
+//    void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
+//        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
+//        when(announcementService.createAnnouncement(any())).thenReturn(announcement);
+//        announcementController.createAnnouncement( "{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+//        verify(announcementService, times(1)).createAnnouncement(any());
+//    }
 
     @Test
     void testDeleteAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {

@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import java.security.Security;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final JWTserviceimpl jwTservice;
+    private final JWTserviceimpl jwtService;
     private final UserService userService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -37,13 +38,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.substring(7);
-        userEmail = jwTservice.extractUsername(jwt);
+        userEmail = jwtService.extractUsername(jwt);
 
 
         if (!StringUtils.isEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
 
-            if (jwTservice.isTokenValid(jwt, userDetails)){
+            if (jwtService.isTokenValid(jwt, userDetails)){
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
@@ -59,5 +60,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    public String filterToken(String token) {
+        System.out.println("token" + token);
+        String accessToken = jwtService.resolveToken(token);
+
+        System.out.println("Access token " + accessToken);
+        if (accessToken == null) {
+            return null;
+        }
+
+        Claims claims = jwtService.resolveClaims(token);
+
+        System.out.println("claims " + claims);
+        if (claims != null && jwtService.validateClaims(claims)) {
+            return claims.get("Role").toString();
+        }
+        return null;
     }
 }

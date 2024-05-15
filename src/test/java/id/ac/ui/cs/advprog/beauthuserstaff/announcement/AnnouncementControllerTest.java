@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.announcement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController.AnnouncementController;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
@@ -37,11 +38,15 @@ public class AnnouncementControllerTest {
     @Mock
     AnnouncementService announcementService;
 
+    @Mock
+    JwtAuthFilter jwtAuthFilter;
+
     @BeforeEach
     void setUp(){
         announcementController = new AnnouncementController();
 
         ReflectionTestUtils.setField(announcementController, "announcementService", announcementService);
+        ReflectionTestUtils.setField(announcementController, "jwtAuthFilter", jwtAuthFilter);
     }
 
 //    @Test
@@ -54,7 +59,8 @@ public class AnnouncementControllerTest {
 
     @Test
     void testDeleteAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
-        announcementController.deleteAnnouncement("{\"id\":\"" + "1" + "\"}");
+        when(jwtAuthFilter.filterToken(anyString())).thenReturn("STAFF");
+        announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
         verify(announcementService, times(1)).deleteAnnouncement(any());
     }
 
@@ -70,8 +76,10 @@ public class AnnouncementControllerTest {
         announcementList.add(announcement2);
 
         when(announcementService.getAllAnnouncements()).thenReturn(announcementList);
+        when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
 
-        String result = announcementController.getAllAnnouncements();
+        String result = announcementController.getAllAnnouncements("token");
+        verify(jwtAuthFilter, times(1)).filterToken("token");
         verify(announcementService, times(1)).getAllAnnouncements();
     }
 }

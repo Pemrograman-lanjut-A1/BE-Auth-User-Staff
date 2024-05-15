@@ -2,8 +2,19 @@ plugins {
     java
     id("org.springframework.boot") version "3.2.4"
     id("io.spring.dependency-management") version "1.1.4"
+    id("org.sonarqube") version "4.4.1.3373"
     jacoco
 }
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Pemrograman-lanjut-A1_BE-Auth-User-Staff")
+        property("sonar.organization", "pemrograman-lanjut-a1")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
+
+
 
 group = "id.ac.ui.cs.advprog"
 version = "0.0.1-SNAPSHOT"
@@ -42,24 +53,65 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation ("jakarta.servlet:jakarta.servlet-api:4.0.4")
+    implementation ("io.micrometer:micrometer-registry-prometheus")
+    implementation ("org.springframework.boot:spring-boot-starter-actuator")
 }
 
-tasks.withType<Test> {
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
+//
+//tasks.test {
+//    useJUnitPlatform()
+//    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+//}
+//tasks.jacocoTestReport {
+//    classDirectories.setFrom(files(classDirectories.files.map {
+//        fileTree(it) { exclude("**/*Application**") }
+//    }))
+//    dependsOn(tasks.test) // tests are required to run before generating the report
+//    reports {
+//        xml.required.set(false)
+//        csv.required.set(false)
+//        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+//    }
+//}
+
+tasks.register<Test>("unitTest"){
+    description = "Runs unit test."
+    group = "verification"
+
+    filter{
+        excludeTestsMatching("*FunctionalTest")
+    }
+}
+
+tasks.register<Test>("functionalTest"){
+    description = "Runs functional test."
+    group = "verification"
+
+    filter{
+        excludeTestsMatching("*FunctionalTest")
+    }
+}
+
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
 tasks.test {
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+    filter {
+        excludeTestsMatching("*FunctionalTest")
+    }
+
+    finalizedBy(tasks.jacocoTestReport)
 }
+
 tasks.jacocoTestReport {
-    classDirectories.setFrom(files(classDirectories.files.map {
-        fileTree(it) { exclude("**/*Application**") }
-    }))
-    dependsOn(tasks.test) // tests are required to run before generating the report
+    dependsOn(tasks.test)
+
     reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        html.required = true
+        xml.required = true
     }
 }

@@ -43,20 +43,7 @@ public class AnnouncementController {
     @PostMapping("/create-announcement")
     public String createAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonContent) throws JSONException {
         Map<String, Object> response = new HashMap<>();
-        String role = null;
-
-        System.out.println("Sebelum try");
-
-        try {
-            System.out.println("Setelah try");
-            role = jwtAuthFilter.filterToken(token);
-        }catch (Exception e){
-            handleJwtException(e);
-        }
-
-
-        System.out.println((role));
-        if (role == null || !(role.equals("STAFF"))){
+        if (authenticate(token).equals("not authenticated")){
             return "403";
         }
 
@@ -70,7 +57,11 @@ public class AnnouncementController {
     }
 
     @PostMapping("/delete-announcement")
-    public String deleteAnnouncement(@RequestBody String jsonId) throws JSONException{
+    public String deleteAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonId) throws JSONException{
+        if (authenticate(token).equals("not authenticated")){
+            return "403";
+        }
+
         System.out.println(jsonId);
         JSONObject jsonObject = new JSONObject(jsonId);
         String id = jsonObject.getString("id");
@@ -79,7 +70,10 @@ public class AnnouncementController {
     }
 
     @GetMapping("/get-all-announcements")
-    public String getAllAnnouncements() throws JsonProcessingException, JSONException {
+    public String getAllAnnouncements(@RequestHeader(value = "Authorization") String token) throws JsonProcessingException, JSONException {
+        if (authenticate(token).equals("not authenticated")){
+            return "403";
+        }
         List<Announcement> announcementList = announcementService.getAllAnnouncements();
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         return ow.writeValueAsString(announcementList);
@@ -91,5 +85,23 @@ public class AnnouncementController {
         response.put("code", HttpStatus.FORBIDDEN.value());
         response.put(MESSAGE_KEY, e instanceof ExpiredJwtException ? EXPIRED_JWT_MESSAGE : INVALID_JWT_MESSAGE);
         return response;
+    }
+
+    private String authenticate(String token){
+        String role = null;
+
+
+        try {
+            role = jwtAuthFilter.filterToken(token);
+        }catch (Exception e){
+            handleJwtException(e);
+        }
+
+
+        System.out.println((role));
+        if (role == null || !(role.equals("STAFF"))){
+            return "not authenticated";
+        }
+        return "authenticated";
     }
 }

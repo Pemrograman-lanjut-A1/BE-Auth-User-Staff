@@ -3,7 +3,7 @@ name: be-auth-user-staff
 services:
   rasukan:
     image: ${REGISTRY_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-    container_name: rasukan
+    container_name: be-auth-user-staff
     ports:
       - "80:8080"
 

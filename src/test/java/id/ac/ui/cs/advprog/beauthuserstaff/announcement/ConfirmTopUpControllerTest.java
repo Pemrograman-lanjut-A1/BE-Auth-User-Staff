@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class ConfirmTopUpControllerTest {
+class ConfirmTopUpControllerTest {
 
     @InjectMocks
     ConfirmTopUpController confirmTopUpController;
@@ -32,11 +32,11 @@ public class ConfirmTopUpControllerTest {
     @BeforeEach
     public void setUp() {
         confirmTopUpController = new ConfirmTopUpController();
-        MockitoAnnotations.initMocks(this); // Initialize mocks
+        MockitoAnnotations.openMocks(this); // Initialize mocks
     }
 
     @Test
-    public void testConfirmTopUp() throws JSONException {
+    void testConfirmTopUp() throws JSONException {
         // Stubbing the restTemplate.exchange() method with exact arguments
         when(restTemplate.exchange(
                 eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
@@ -46,7 +46,7 @@ public class ConfirmTopUpControllerTest {
         )).thenReturn(null);
 
         // Calling the method under test
-        ResponseEntity<String> responseEntity = confirmTopUpController
+        confirmTopUpController
                 .confirmTopUp("{\n    \"id\": \"4e7deb2f-925b-4bbd-8833-14a8ef9cf918\"\n}");
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
@@ -60,7 +60,7 @@ public class ConfirmTopUpControllerTest {
 
 
     @Test
-    public void testGetAllWaitingTopUps(){
+    void testGetAllWaitingTopUps(){
         when(restTemplate.exchange(
                 eq("http://localhost:8081/topup/waiting"), // URL
                 eq(HttpMethod.GET), // HTTP method
@@ -69,7 +69,7 @@ public class ConfirmTopUpControllerTest {
         )).thenReturn(null);
 
         // Calling the method under test
-        ResponseEntity<?> responseEntity = confirmTopUpController
+        confirmTopUpController
                 .getAllWaitingTopUps();
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments

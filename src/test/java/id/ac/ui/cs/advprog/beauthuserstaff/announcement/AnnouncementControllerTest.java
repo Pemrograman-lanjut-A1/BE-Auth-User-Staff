@@ -5,7 +5,6 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard.AnnouncementController;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

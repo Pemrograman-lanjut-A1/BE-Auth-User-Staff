@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class AnnouncementRepositoryTest {
+class AnnouncementRepositoryTest {
 
     @InjectMocks
     AnnouncementRepository announcementRepository;
@@ -51,7 +51,7 @@ public class AnnouncementRepositoryTest {
 
     @Test
     void testAddAndGetAnnouncement(){
-        Announcement announcement = announcements.get(0);
+        Announcement announcement = announcements.getFirst();
         when(entityManager.find(eq(Announcement.class), any())).thenReturn(announcement);
         Announcement result = announcementRepository.addAnnouncement(announcement);
 

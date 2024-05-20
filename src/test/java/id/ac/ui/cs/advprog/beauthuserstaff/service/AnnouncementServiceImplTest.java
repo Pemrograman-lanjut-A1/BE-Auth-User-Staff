@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class AnnouncementServiceImplTest {
+class AnnouncementServiceImplTest {
 
 
     @InjectMocks
@@ -44,7 +44,7 @@ public class AnnouncementServiceImplTest {
 
     @BeforeEach
     void setUp(){
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         announcements = new ArrayList<>();
         announcementService = new AnnouncementServiceImpl();
 

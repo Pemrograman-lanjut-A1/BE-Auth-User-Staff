@@ -36,7 +36,6 @@ public class ConfirmTopUpController {
 
         JSONObject jsonObject = new JSONObject(jsonContent);
         String id = jsonObject.getString("id");
-        System.out.println(id);
         String confirmUrl = "http://localhost:8081/topup/" + id + "/confirm";
 
         HttpHeaders headers = new HttpHeaders();
@@ -44,25 +43,20 @@ public class ConfirmTopUpController {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
+        return restTemplate.exchange(
                 confirmUrl, HttpMethod.PUT, requestEntity, String.class);
-
-        return responseEntity;
     }
 
     @GetMapping("/view-waiting-top-ups")
-    public ResponseEntity<?> getAllWaitingTopUps(){
+    public ResponseEntity<String> getAllWaitingTopUps(){
         String url = "http://localhost:8081/topup/waiting";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
+        return restTemplate.exchange(
                 url, HttpMethod.GET, requestEntity, String.class);
-
-        return responseEntity;
-
     }
 
 }

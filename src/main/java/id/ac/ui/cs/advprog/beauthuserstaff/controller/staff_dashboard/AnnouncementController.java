@@ -27,17 +27,11 @@ public class AnnouncementController {
     private static final String CODE_KEY = "code";
 
     private static final String AUTHENTICATED_KEY = "authenticated";
-
     private static final String NOT_AUTHENTICATED_KEY = "not authenticated";
     private static final String SUCCESS_MESSAGE = "Request Successful";
-    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Something Wrong With Server";
     private static final String EXPIRED_JWT_MESSAGE = "JWT token has expired";
     private static final String INVALID_JWT_MESSAGE = "Invalid JWT token";
     private static final String FORBIDDEN_MESSAGE = "You are not authorized to make this request";
-    private static final String ERROR_KEY_MESSAGE = "Error";
-    private static final String TOP_UP_ID_MESSAGE = "Top-up with ID ";
-    private static final String NOT_FOUND_MESSAGE = " not found.";
-
 
 
     @Autowired
@@ -49,7 +43,6 @@ public class AnnouncementController {
     @PostMapping("/create-announcement")
     public String createAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonContent) throws JSONException {
         if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)){
-            System.out.println("not_authenticated");
             return FORBIDDEN_MESSAGE;
         }
 
@@ -103,8 +96,8 @@ public class AnnouncementController {
 
 
         if (role == null || !(role.equals("STAFF"))){
-            return "not authenticated";
+            return NOT_AUTHENTICATED_KEY;
         }
-        return "authenticated";
+        return AUTHENTICATED_KEY;
     }
 }

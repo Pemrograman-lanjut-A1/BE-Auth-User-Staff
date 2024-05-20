@@ -22,15 +22,9 @@ import java.util.Map;
 @CrossOrigin(origins="*")
 public class AnnouncementController {
 
-    private static final String MESSAGE_KEY = "message";
-
-    private static final String CODE_KEY = "code";
-
     private static final String AUTHENTICATED_KEY = "authenticated";
     private static final String NOT_AUTHENTICATED_KEY = "not authenticated";
     private static final String SUCCESS_MESSAGE = "Request Successful";
-    private static final String EXPIRED_JWT_MESSAGE = "JWT token has expired";
-    private static final String INVALID_JWT_MESSAGE = "Invalid JWT token";
     private static final String FORBIDDEN_MESSAGE = "You are not authorized to make this request";
 
 
@@ -76,23 +70,12 @@ public class AnnouncementController {
         return ow.writeValueAsString(announcementList);
     }
 
-
-    private Map<String, Object> handleJwtException(Exception e) {
-        Map<String, Object> response = new HashMap<>();
-        response.put(CODE_KEY, HttpStatus.FORBIDDEN.value());
-        response.put(MESSAGE_KEY, e instanceof ExpiredJwtException ? EXPIRED_JWT_MESSAGE : INVALID_JWT_MESSAGE);
-        return response;
-    }
-
     private String authenticate(String token){
         String role = null;
 
-
         try {
             role = jwtAuthFilter.filterToken(token);
-        }catch (Exception e){
-            handleJwtException(e);
-        }
+        }catch (Exception ignored){}
 
 
         if (role == null || !(role.equals("STAFF"))){

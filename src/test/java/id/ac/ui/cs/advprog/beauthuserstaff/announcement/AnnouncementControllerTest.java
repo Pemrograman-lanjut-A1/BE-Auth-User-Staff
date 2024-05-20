@@ -11,11 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -41,7 +43,7 @@ class AnnouncementControllerTest {
     }
 
     @Test
-    void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
+    void testCreateAnnouncementSuccess() throws org.springframework.boot.configurationprocessor.json.JSONException {
 
         when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
 
@@ -54,10 +56,24 @@ class AnnouncementControllerTest {
     }
 
     @Test
+    void testCreateAnnouncementForbiddden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+        assertEquals(result,"You are not authorized to make this request");
+    }
+
+    @Test
     void testDeleteAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
         when(jwtAuthFilter.filterToken(anyString())).thenReturn("STAFF");
         announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
         verify(announcementService, times(1)).deleteAnnouncement(any());
+    }
+
+    @Test
+    void testDeleteAnnouncementForbiddden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
+        assertEquals(result,"You are not authorized to make this request");
     }
 
 
@@ -77,5 +93,12 @@ class AnnouncementControllerTest {
         announcementController.getAllAnnouncements("token");
         verify(jwtAuthFilter, times(1)).filterToken("token");
         verify(announcementService, times(1)).getAllAnnouncements();
+    }
+
+    @Test
+    void testGetAllAnnouncementsForbiddden() throws JsonProcessingException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.getAllAnnouncements("token");
+        assertEquals(result,"You are not authorized to make this request");
     }
 }

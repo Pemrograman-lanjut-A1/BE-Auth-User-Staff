@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController;
+package id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.ConfirmTopUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;

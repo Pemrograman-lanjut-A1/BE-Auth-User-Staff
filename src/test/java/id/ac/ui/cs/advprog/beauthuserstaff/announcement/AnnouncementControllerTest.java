@@ -96,8 +96,15 @@ class AnnouncementControllerTest {
     }
 
     @Test
-    void testGetAllAnnouncementsForbiddden() throws JsonProcessingException {
+    void testGetAllAnnouncementsRoleNull() throws JsonProcessingException {
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.getAllAnnouncements("token");
+        assertEquals(result,"You are not authorized to make this request");
+    }
+
+    @Test
+    void testGetAllAnnouncementsWrongRole() throws JsonProcessingException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
         String result = announcementController.getAllAnnouncements("token");
         assertEquals(result,"You are not authorized to make this request");
     }

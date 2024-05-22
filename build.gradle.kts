@@ -1,3 +1,5 @@
+
+
 plugins {
     java
     id("org.springframework.boot") version "3.2.4"
@@ -33,49 +35,45 @@ repositories {
     mavenCentral()
 }
 
+val jwtApi = "0.11.5"
+val jwtImpl = "0.11.5"
+val jwtJackson = "0.11.5"
+val commonsLang = "3.14.0"
+val servletApi = "4.0.4"
+
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation ("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.jsonwebtoken:jjwt-api:$jwtApi")
+    implementation("io.jsonwebtoken:jjwt-impl:$jwtImpl")
+    implementation("io.jsonwebtoken:jjwt-jackson:$jwtJackson")
+    implementation("org.apache.commons:commons-lang3:$commonsLang")
+    implementation ("jakarta.servlet:jakarta.servlet-api:$servletApi")
+    implementation ("io.micrometer:micrometer-registry-prometheus")
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("org.springframework.boot:spring-boot-configuration-processor")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    runtimeOnly("org.postgresql:postgresql")
-    implementation("org.springframework.boot:spring-boot-configuration-processor")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    runtimeOnly("org.postgresql:postgresql")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    implementation("org.apache.commons:commons-lang3:3.14.0")
-    implementation ("jakarta.servlet:jakarta.servlet-api:4.0.4")
-    implementation ("io.micrometer:micrometer-registry-prometheus")
-    implementation ("org.springframework.boot:spring-boot-starter-actuator")
-}
 
-//tasks.withType<Test> {
-//    useJUnitPlatform()
-//}
-//
-//tasks.test {
-//    useJUnitPlatform()
-//    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-//}
-//tasks.jacocoTestReport {
-//    classDirectories.setFrom(files(classDirectories.files.map {
-//        fileTree(it) { exclude("**/*Application**") }
-//    }))
-//    dependsOn(tasks.test) // tests are required to run before generating the report
-//    reports {
-//        xml.required.set(false)
-//        csv.required.set(false)
-//        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-//    }
-//}
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    compileOnly("org.projectlombok:lombok")
+
+    runtimeOnly("org.postgresql:postgresql")
+
+
+
+
+
+
+
+
+
+}
 
 tasks.register<Test>("unitTest"){
     description = "Runs unit test."

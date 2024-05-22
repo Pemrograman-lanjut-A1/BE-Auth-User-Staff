@@ -2,35 +2,28 @@ package id.ac.ui.cs.advprog.beauthuserstaff.announcement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
-import id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController.AnnouncementController;
+import id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard.AnnouncementController;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
-import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
-import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementServiceImpl;
-import jakarta.persistence.EntityManager;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
-public class AnnouncementControllerTest {
+class AnnouncementControllerTest {
 
     @InjectMocks
     AnnouncementController announcementController;
@@ -49,13 +42,25 @@ public class AnnouncementControllerTest {
         ReflectionTestUtils.setField(announcementController, "jwtAuthFilter", jwtAuthFilter);
     }
 
-//    @Test
-//    void testCreateAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
-//        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
-//        when(announcementService.createAnnouncement(any())).thenReturn(announcement);
-//        announcementController.createAnnouncement( "{\"content\":\"hello\", \"tag\": \"TagTest\" }");
-//        verify(announcementService, times(1)).createAnnouncement(any());
-//    }
+    @Test
+    void testCreateAnnouncementSuccess() throws org.springframework.boot.configurationprocessor.json.JSONException {
+
+        when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
+
+
+
+        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
+        when(announcementService.createAnnouncement(any())).thenReturn(announcement);
+        announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+        verify(announcementService, times(1)).createAnnouncement(any());
+    }
+
+    @Test
+    void testCreateAnnouncementForbiddden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+        assertEquals(result,"You are not authorized to make this request");
+    }
 
     @Test
     void testDeleteAnnouncement() throws org.springframework.boot.configurationprocessor.json.JSONException {
@@ -64,9 +69,16 @@ public class AnnouncementControllerTest {
         verify(announcementService, times(1)).deleteAnnouncement(any());
     }
 
+    @Test
+    void testDeleteAnnouncementForbiddden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
+        assertEquals(result,"You are not authorized to make this request");
+    }
+
 
     @Test
-    void testGetAllAnnouncements() throws JsonProcessingException, JSONException, org.springframework.boot.configurationprocessor.json.JSONException {
+    void testGetAllAnnouncements() throws JsonProcessingException{
         Announcement announcement1 = new Announcement();
         Announcement announcement2 = new Announcement();
 
@@ -78,8 +90,22 @@ public class AnnouncementControllerTest {
         when(announcementService.getAllAnnouncements()).thenReturn(announcementList);
         when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
 
-        String result = announcementController.getAllAnnouncements("token");
+        announcementController.getAllAnnouncements("token");
         verify(jwtAuthFilter, times(1)).filterToken("token");
         verify(announcementService, times(1)).getAllAnnouncements();
+    }
+
+    @Test
+    void testGetAllAnnouncementsRoleNull() throws JsonProcessingException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        String result = announcementController.getAllAnnouncements("token");
+        assertEquals(result,"You are not authorized to make this request");
+    }
+
+    @Test
+    void testGetAllAnnouncementsWrongRole() throws JsonProcessingException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
+        String result = announcementController.getAllAnnouncements("token");
+        assertEquals(result,"You are not authorized to make this request");
     }
 }

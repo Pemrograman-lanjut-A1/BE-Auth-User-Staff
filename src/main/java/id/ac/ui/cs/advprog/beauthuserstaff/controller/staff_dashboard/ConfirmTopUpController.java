@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.beauthuserstaff.controller.StaffDashboardController;
+package id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.ConfirmTopUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -36,33 +36,29 @@ public class ConfirmTopUpController {
 
         JSONObject jsonObject = new JSONObject(jsonContent);
         String id = jsonObject.getString("id");
-        System.out.println(id);
-        String confirmUrl = "http://localhost:8081/topup/" + id + "/confirm";
+        //String confirmUrl = "http://localhost:8081/topup/" + id + "/confirm";
+        String confirmUrl = "34.142.213.219/topup/" + id + "/confirm";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
+        return restTemplate.exchange(
                 confirmUrl, HttpMethod.PUT, requestEntity, String.class);
-
-        return responseEntity;
     }
 
     @GetMapping("/view-waiting-top-ups")
-    public ResponseEntity<?> getAllWaitingTopUps(){
-        String url = "http://localhost:8081/topup/waiting";
+    public ResponseEntity<String> getAllWaitingTopUps(){
+        //String url = "http://localhost:8081/topup/waiting";
+        String url = "34.142.213.219/topup/waiting";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
+        return restTemplate.exchange(
                 url, HttpMethod.GET, requestEntity, String.class);
-
-        return responseEntity;
-
     }
 
 }

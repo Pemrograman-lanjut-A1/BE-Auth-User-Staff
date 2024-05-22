@@ -5,7 +5,7 @@ services:
     image: ${REGISTRY_USER}/${IMAGE_NAME}:${IMAGE_TAG}
     container_name: be-auth-user-staff
     ports:
-      - "8081:8080"
+      - "80:8080"
 
   prometheus:
     image: prom/prometheus:v2.44.0

@@ -55,8 +55,10 @@ jobs:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
+
       - name: Make gradlew executable
-        run: chmod +x ./gradlew --warning-mode=summary
+        run: chmod +x ./gradlew
+
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
@@ -64,6 +66,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
       - name: Test with Gradle
         env:
           JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
@@ -71,9 +74,9 @@ jobs:
           JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
         run: |
           ./gradlew check --info --stacktrace --warning-mode=summary
-          ./gradlew test
-          ./gradlew jacocoTestReport
-      # (Optional) Add steps for generating coverage report and other post-test tasks
+          ./gradlew test --warning-mode=summary
+          ./gradlew jacocoTestReport --warning-mode=summary
+        # (Optional) Add steps for generating coverage report and other post-test tasks
 
   publish:
     name: Publish Docker Image

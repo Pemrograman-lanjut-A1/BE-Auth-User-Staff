@@ -37,7 +37,7 @@ public class ConfirmTopUpController {
         JSONObject jsonObject = new JSONObject(jsonContent);
         String id = jsonObject.getString("id");
         //String confirmUrl = "http://localhost:8081/topup/" + id + "/confirm";
-        String confirmUrl = "34.142.213.219/topup/" + id + "/confirm";
+        String confirmUrl = "http://" + "34.142.213.219/topup/" + id + "/confirm";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -51,7 +51,7 @@ public class ConfirmTopUpController {
     @GetMapping("/view-waiting-top-ups")
     public ResponseEntity<String> getAllWaitingTopUps(){
         //String url = "http://localhost:8081/topup/waiting";
-        String url = "34.142.213.219/topup/waiting";
+        String url = "http://" + "34.142.213.219/topup/waiting";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

@@ -64,7 +64,7 @@ class ConfirmTopUpControllerTest {
     void testGetAllWaitingTopUps(){
         when(restTemplate.exchange(
                 //eq("http://localhost:8081/topup/waiting"), // URL
-                eq("34.142.213.219/topup/waiting"), // URL
+                eq("http://34.142.213.219/topup/waiting"), // URL
                 eq(HttpMethod.GET), // HTTP method
                 any(), // Request entity
                 eq(String.class) // Response type
@@ -77,7 +77,7 @@ class ConfirmTopUpControllerTest {
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
                 //eq("http://localhost:8081/topup/waiting"),
-                eq("34.142.213.219/topup/waiting"), // URL
+                eq("http://34.142.213.219/topup/waiting"), // URL
                 eq(HttpMethod.GET),
                 any(),
                 eq(String.class)

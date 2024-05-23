@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard.AnnouncementController;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
+import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ class AnnouncementControllerTest {
     }
 
     @Test
-    void testCreateAnnouncementForbiddden() throws JSONException {
+    void testCreateAnnouncementForbidden() throws JSONException {
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
         String result = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
         assertEquals(result,"You are not authorized to make this request");
@@ -70,7 +71,7 @@ class AnnouncementControllerTest {
     }
 
     @Test
-    void testDeleteAnnouncementForbiddden() throws JSONException {
+    void testDeleteAnnouncementForbidden() throws JSONException {
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
         String result = announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
         assertEquals(result,"You are not authorized to make this request");
@@ -79,8 +80,8 @@ class AnnouncementControllerTest {
 
     @Test
     void testGetAllAnnouncements() throws JsonProcessingException{
-        Announcement announcement1 = new Announcement();
-        Announcement announcement2 = new Announcement();
+        Announcement announcement1 = new AnnouncementBuilder().content("hello").build();
+        Announcement announcement2 = new AnnouncementBuilder().content("hello").build();
 
         List<Announcement> announcementList = new ArrayList<>();
 

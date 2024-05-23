@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.announcement;
 
+import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard.ConfirmTopUpController;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.ConfirmTopUpService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +10,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -28,6 +32,9 @@ class ConfirmTopUpControllerTest {
     @Mock
     RestTemplate restTemplate;
 
+    @Mock
+    JwtAuthFilter jwtAuthFilter;
+
     @BeforeEach
     public void setUp() {
         confirmTopUpController = new ConfirmTopUpController();
@@ -35,7 +42,9 @@ class ConfirmTopUpControllerTest {
     }
 
     @Test
-    void testConfirmTopUp() throws JSONException {
+    void testConfirmTopUpSuccess() throws JSONException {
+
+        when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
         // Stubbing the restTemplate.exchange() method with exact arguments
         when(restTemplate.exchange(
                 //eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
@@ -47,7 +56,7 @@ class ConfirmTopUpControllerTest {
 
         // Calling the method under test
         confirmTopUpController
-                .confirmTopUp("{\n    \"id\": \"4e7deb2f-925b-4bbd-8833-14a8ef9cf918\"\n}");
+                .confirmTopUp("token", "{\n    \"id\": \"4e7deb2f-925b-4bbd-8833-14a8ef9cf918\"\n}");
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
@@ -59,9 +68,32 @@ class ConfirmTopUpControllerTest {
         );
     }
 
+    @Test
+    void testConfirmTopUpForbidden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        ResponseEntity<String> result = confirmTopUpController
+                .confirmTopUp("token", "{\n    \"id\": \"4e7deb2f-925b-4bbd-8833-14a8ef9cf918\"\n}");
+        ResponseEntity<String> expectedResponse = ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
+                .body("You are not authorized to make this request");
+        assertEquals(expectedResponse,result);
+    }
 
     @Test
-    void testGetAllWaitingTopUps(){
+    void testConfirmTopUpWrongRole() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
+        ResponseEntity<String> result = confirmTopUpController
+                .confirmTopUp("token", "{\n    \"id\": \"4e7deb2f-925b-4bbd-8833-14a8ef9cf918\"\n}");
+        ResponseEntity<String> expectedResponse = ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
+                .body("You are not authorized to make this request");
+        assertEquals(expectedResponse,result);
+    }
+
+
+    @Test
+    void testGetAllWaitingTopUpsSuccess(){
+        when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
         when(restTemplate.exchange(
                 //eq("http://localhost:8081/topup/waiting"), // URL
                 eq("http://34.142.213.219/topup/waiting"), // URL
@@ -72,7 +104,7 @@ class ConfirmTopUpControllerTest {
 
         // Calling the method under test
         confirmTopUpController
-                .getAllWaitingTopUps();
+                .getAllWaitingTopUps("token");
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
@@ -82,5 +114,28 @@ class ConfirmTopUpControllerTest {
                 any(),
                 eq(String.class)
         );
+    }
+
+
+    @Test
+    void testGetAllWaitingTopUpsForbidden() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
+        ResponseEntity<String> result = confirmTopUpController
+                .getAllWaitingTopUps("token");
+        ResponseEntity<String> expectedResponse = ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
+                .body("You are not authorized to make this request");
+        assertEquals(expectedResponse,result);
+    }
+
+    @Test
+    void testGetAllWaitingTopUpsWrongRole() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
+        ResponseEntity<String> result = confirmTopUpController
+                .getAllWaitingTopUps("token");
+        ResponseEntity<String> expectedResponse = ResponseEntity
+                .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
+                .body("You are not authorized to make this request");
+        assertEquals(expectedResponse,result);
     }
 }

@@ -31,7 +31,6 @@ public class ConfirmTopUpController {
 
     private static final String AUTHENTICATED_KEY = "authenticated";
     private static final String NOT_AUTHENTICATED_KEY = "not authenticated";
-    private static final String SUCCESS_MESSAGE = "Request Successful";
     private static final String FORBIDDEN_MESSAGE = "You are not authorized to make this request";
 
 

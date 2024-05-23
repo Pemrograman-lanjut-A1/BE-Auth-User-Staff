@@ -78,6 +78,7 @@ jobs:
           ./gradlew jacocoTestReport --warning-mode=all
 
       - name: Upload Test Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gradle-test-report

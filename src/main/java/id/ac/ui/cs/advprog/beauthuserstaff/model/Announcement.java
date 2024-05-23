@@ -15,8 +15,9 @@ public class Announcement {
     String id;
     String content;
     String tag;
+    String title;
 
-    public Announcement(String id, String content, String tag){
+    public Announcement(String id, String content, String tag, String title){
         if(id == null){
             UUID uuid = UUID.randomUUID();
             this.id = (uuid.toString());
@@ -26,5 +27,6 @@ public class Announcement {
         }
         this.tag = tag;
         this.content = content;
+        this.title = title;
     }
 }

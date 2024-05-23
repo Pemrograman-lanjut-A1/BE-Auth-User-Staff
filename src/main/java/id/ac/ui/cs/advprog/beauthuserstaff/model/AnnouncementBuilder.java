@@ -4,6 +4,7 @@ public class AnnouncementBuilder {
     private String id;
     private String content;
     private String tag;
+    private String title;
 
     public AnnouncementBuilder id(String id){
         this.id = id;
@@ -20,10 +21,17 @@ public class AnnouncementBuilder {
         return this;
     }
 
+    public AnnouncementBuilder title(String title){
+        this.title = title;
+        return this;
+    }
+
+
+
     public Announcement build(){
         if (content == null){
             throw new IllegalArgumentException("Content cannot be null");
         }
-        return new Announcement(id, content, tag);
+        return new Announcement(id, content, tag, title);
     }
 }

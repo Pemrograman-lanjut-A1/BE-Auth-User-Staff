@@ -33,13 +33,22 @@ public class AnnouncementController {
     @PostMapping("/create-announcement")
     public String createAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonContent) throws JSONException {
         if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)){
+
+            System.out.println("masuk sini");
             return FORBIDDEN_MESSAGE;
         }
 
         JSONObject jsonObject = new JSONObject(jsonContent);
+        AnnouncementBuilder announcementBuilder = new AnnouncementBuilder();
         String content = jsonObject.getString("content");
-        String tag = jsonObject.getString("tag");
-        Announcement newAnnouncement = new AnnouncementBuilder().content(content).tag(tag).build();
+        announcementBuilder.content(content);
+        if (jsonObject.has("tag")) {
+            announcementBuilder.tag(jsonObject.getString("tag"));
+        }
+        if (jsonObject.has("title")) {
+            announcementBuilder.title(jsonObject.getString("title"));
+        }
+        Announcement newAnnouncement = announcementBuilder.build();
         announcementService.createAnnouncement(newAnnouncement);
         return SUCCESS_MESSAGE;
     }

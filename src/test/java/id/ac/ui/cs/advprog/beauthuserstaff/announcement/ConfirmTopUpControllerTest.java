@@ -39,7 +39,7 @@ class ConfirmTopUpControllerTest {
         // Stubbing the restTemplate.exchange() method with exact arguments
         when(restTemplate.exchange(
                 //eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
-                eq("34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
+                eq("http://34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
                 eq(HttpMethod.PUT), // HTTP method
                 any(), // Request entity
                 eq(String.class) // Response type
@@ -52,7 +52,7 @@ class ConfirmTopUpControllerTest {
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
                 //eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"),
-                eq("34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"),
+                eq("http://34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"),
                 eq(HttpMethod.PUT),
                 any(),
                 eq(String.class)

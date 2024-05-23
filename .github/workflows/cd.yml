@@ -73,10 +73,9 @@ jobs:
           JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
           JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
         run: |
-          ./gradlew check --info --stacktrace --warning-mode=summary
-          ./gradlew test --warning-mode=summary
-          ./gradlew jacocoTestReport --warning-mode=summary
-        # (Optional) Add steps for generating coverage report and other post-test tasks
+          ./gradlew check --info --stacktrace --warning-mode=all
+          ./gradlew test --warning-mode=all
+          ./gradlew jacocoTestReport --warning-mode=all
 
   publish:
     name: Publish Docker Image

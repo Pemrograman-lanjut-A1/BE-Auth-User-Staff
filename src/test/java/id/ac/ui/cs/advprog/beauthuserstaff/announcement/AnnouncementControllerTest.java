@@ -49,7 +49,7 @@ class AnnouncementControllerTest {
 
 
 
-        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null);
+        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null, null);
         when(announcementService.createAnnouncement(any())).thenReturn(announcement);
         announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
         verify(announcementService, times(1)).createAnnouncement(any());

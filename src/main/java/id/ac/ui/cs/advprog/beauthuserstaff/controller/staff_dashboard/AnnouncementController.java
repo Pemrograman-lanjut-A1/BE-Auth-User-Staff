@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
@@ -11,6 +13,7 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -33,13 +36,22 @@ public class AnnouncementController {
     @PostMapping("/create-announcement")
     public String createAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonContent) throws JSONException {
         if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)){
+
+            System.out.println("masuk sini");
             return FORBIDDEN_MESSAGE;
         }
 
         JSONObject jsonObject = new JSONObject(jsonContent);
+        AnnouncementBuilder announcementBuilder = new AnnouncementBuilder();
         String content = jsonObject.getString("content");
-        String tag = jsonObject.getString("tag");
-        Announcement newAnnouncement = new AnnouncementBuilder().content(content).tag(tag).build();
+        announcementBuilder.content(content);
+        if (jsonObject.has("tag")) {
+            announcementBuilder.tag(jsonObject.getString("tag"));
+        }
+        if (jsonObject.has("title")) {
+            announcementBuilder.title(jsonObject.getString("title"));
+        }
+        Announcement newAnnouncement = announcementBuilder.build();
         announcementService.createAnnouncement(newAnnouncement);
         return SUCCESS_MESSAGE;
     }
@@ -57,12 +69,21 @@ public class AnnouncementController {
     }
 
     @GetMapping("/get-all-announcements")
-    public String getAllAnnouncements(@RequestHeader(value = "Authorization") String token) throws JsonProcessingException{
-        if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)){
+    public String getAllAnnouncements(@RequestHeader(value = "Authorization") String token) throws JsonProcessingException {
+        if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)) {
             return FORBIDDEN_MESSAGE;
         }
         List<Announcement> announcementList = announcementService.getAllAnnouncements();
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+
+        // Sort the list by creationTimestamp in descending order
+        announcementList.sort(Comparator.comparing(Announcement::getCreationTimestamp).reversed());
+
+        // Configure the ObjectMapper
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+
         return ow.writeValueAsString(announcementList);
     }
 

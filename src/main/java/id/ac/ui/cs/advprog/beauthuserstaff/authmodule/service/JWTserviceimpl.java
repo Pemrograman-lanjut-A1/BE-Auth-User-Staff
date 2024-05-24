@@ -48,7 +48,7 @@ public class JWTserviceimpl implements JWTservice {
     }
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
+    public JWTserviceimpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
     @Override
@@ -87,7 +87,7 @@ public class JWTserviceimpl implements JWTservice {
         final Claims claims = extractAllClaims(token);
         return claimResolvers.apply(claims);
     }
-    private Key getSignInKey(){
+    public Key getSignInKey(){
         byte[] key = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(key);
     }

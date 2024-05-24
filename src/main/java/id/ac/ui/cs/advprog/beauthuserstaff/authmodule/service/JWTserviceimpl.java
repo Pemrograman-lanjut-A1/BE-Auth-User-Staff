@@ -38,6 +38,7 @@ public class JWTserviceimpl implements JWTservice {
     private String secretKey;
     private JwtParser jwtParser;
     private UserRepository userRepository;
+    private static final String BEARERPREFIX = "Bearer ";
 
     @PostConstruct
     public void init(){
@@ -104,4 +105,25 @@ public class JWTserviceimpl implements JWTservice {
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }
 
+    private Claims parseJwtClaims(String token) {
+        return jwtParser.parseClaimsJws(token).getBody();
+    }
+
+    public Claims resolveClaims(String bearerToken) {
+        String token = resolveToken(bearerToken);
+        if (token != null) {
+            return parseJwtClaims(token);
+        }
+        return null;
+    }
+    public String resolveToken(String bearerToken) {
+
+        if (bearerToken != null && bearerToken.startsWith(BEARERPREFIX)) {
+            return bearerToken.substring(BEARERPREFIX.length());
+        }
+        return null;
+    }
+    public boolean validateClaims(Claims claims) throws AuthenticationException {
+        return claims.getExpiration().after(new Date());
+    }
 }

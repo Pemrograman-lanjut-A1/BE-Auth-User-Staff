@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignInRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignUpRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthService;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.ResponseHandler;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,14 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8080", " http://34.142.244.77"})
 public class AuthenticationController  {
+    private AuthService authService;
 
     @Autowired
-    private final AuthService authService;
+    public AuthenticationController(AuthService authService){
+        this.authService = authService;
+    }
 
     @PostMapping("/signup")
     public CompletableFuture<ResponseEntity<Object>> signUp(@RequestBody SignUpRequest signUpRequest) throws JsonProcessingException {
@@ -46,14 +50,22 @@ public class AuthenticationController  {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
+        try {
+            JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
+            return ResponseEntity.ok(response);
+        } catch (ExpiredJwtException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String token) {
+    public ResponseEntity<Object> logout(@RequestHeader(value = "Authorization", required = false) String token) {
         Map<String, Object> response = new HashMap<>();
         ResponseHandler.generateLogoutResponse(token, response);
         return ResponseHandler.generateResponse((String) response.get("message"),
                 (HttpStatus) response.get("status"), response);
     }
+
 }

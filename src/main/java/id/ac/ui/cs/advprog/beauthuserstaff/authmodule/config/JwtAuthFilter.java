@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,15 +18,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
-import java.security.Security;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final JWTserviceimpl jwTservice;
+    private final JWTserviceimpl jwtService;
     private final UserService userService;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
@@ -37,13 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.substring(7);
-        userEmail = jwTservice.extractUsername(jwt);
+        userEmail = jwtService.extractUsername(jwt);
 
 
         if (!StringUtils.isEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
 
-            if (jwTservice.isTokenValid(jwt, userDetails)){
+            if (jwtService.isTokenValid(jwt, userDetails)){
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
@@ -59,5 +59,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    public String filterToken(String token) {
+        String accessToken = jwtService.resolveToken(token);
+
+        if (accessToken == null) {
+            return null;
+        }
+
+        Claims claims = jwtService.resolveClaims(token);
+
+        if (claims != null && jwtService.validateClaims(claims)) {
+            return claims.get("Role").toString();
+        }
+        return null;
     }
 }

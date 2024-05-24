@@ -6,58 +6,106 @@ import static org.junit.jupiter.api.Assertions.*;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.context.SecurityContextHolder;
-
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+
 import java.io.IOException;
 
-class JwtAuthFilterTest {
+@ExtendWith(MockitoExtension.class)
+public class JwtAuthFilterTest {
+
+    @InjectMocks
+    private JwtAuthFilter jwtAuthFilter;
 
     @Mock
     private JWTserviceimpl jwtService;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private UserDetailsService userDetailsService;
 
     @Mock
-    private UserService userService;
+    private HttpServletRequest request;
 
-    @InjectMocks
-    private JwtAuthFilter jwtAuthFilter;
+    @Mock
+    private HttpServletResponse response;
+
+    @Mock
+    private FilterChain filterChain;
+
+    @Mock
+    private UserDetails userDetails;
+
+    @Mock
+    private Claims claims;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
-        when(userService.userDetailsService()).thenReturn(userDetailsService);
-
+    public void setUp() {
+        SecurityContextHolder.clearContext();
+        lenient().when(userService.userDetailsService()).thenReturn(userDetailsService);
     }
 
     @Test
-    void doFilterInternal_NoToken_ShouldNotAuthenticateUser() throws ServletException, IOException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        FilterChain filterChain = mock(FilterChain.class);
+    public void testDoFilterInternalWithValidToken() throws ServletException, IOException {
+        String token = "Bearer validToken";
+        String username = "test@example.com";
 
-        when(request.getHeader("Authorization")).thenReturn(null);
+        when(request.getHeader("Authorization")).thenReturn(token);
+        when(jwtService.extractUsername("validToken")).thenReturn(username);
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        when(jwtService.isTokenValid("validToken", userDetails)).thenReturn(true);
 
-        jwtAuthFilter.doFilter(request, response, filterChain);
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain).doFilter(request, response);
-
-        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    @Test
+    public void testDoFilterInternalWithInvalidToken() throws ServletException, IOException {
+        String token = "Bearer invalidToken";
+
+        when(request.getHeader("Authorization")).thenReturn(token);
+        when(jwtService.extractUsername("invalidToken")).thenReturn(null);
+
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    public void testDoFilterInternalWithoutToken() throws ServletException, IOException {
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+    @Test
+    public void testFilterTokenWithInvalidToken() {
+        String token = "Bearer invalidToken";
+
+        when(jwtService.resolveToken("Bearer invalidToken")).thenReturn(null);
+
+        String role = jwtAuthFilter.filterToken(token);
+        assertNull(role);
+    }
 }
-
-

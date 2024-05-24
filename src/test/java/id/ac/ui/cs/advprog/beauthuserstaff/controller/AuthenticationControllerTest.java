@@ -9,6 +9,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignInRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignUpRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthService;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.ResponseHandler;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -145,6 +146,32 @@ class AuthenticationControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expectedResponse, response.getBody());
+    }
+
+    @Test
+    void refresh_shouldReturnUnauthorizedWhenJwtExceptionThrown() {
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+
+        when(authService.refreshToken(any(RefreshTokenRequest.class))).thenThrow(ExpiredJwtException.class);
+
+        ResponseEntity<JwtAuthResponse> response = authenticationController.refresh(refreshTokenRequest);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+        verify(authService, times(1)).refreshToken(any(RefreshTokenRequest.class));
+    }
+
+    @Test
+    void refresh_shouldReturnBadRequestWhenOtherExceptionThrown() {
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+
+        when(authService.refreshToken(any(RefreshTokenRequest.class))).thenThrow(RuntimeException.class);
+
+        ResponseEntity<JwtAuthResponse> response = authenticationController.refresh(refreshTokenRequest);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        verify(authService, times(1)).refreshToken(any(RefreshTokenRequest.class));
     }
 
 }

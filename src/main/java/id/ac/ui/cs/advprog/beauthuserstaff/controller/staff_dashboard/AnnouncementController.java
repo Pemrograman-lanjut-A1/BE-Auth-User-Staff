@@ -75,8 +75,6 @@ public class AnnouncementController {
         }
         List<Announcement> announcementList = announcementService.getAllAnnouncements();
 
-
-
         // Configure the ObjectMapper
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

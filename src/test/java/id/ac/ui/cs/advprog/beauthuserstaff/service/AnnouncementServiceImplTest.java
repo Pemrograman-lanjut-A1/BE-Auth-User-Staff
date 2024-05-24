@@ -3,9 +3,7 @@ package id.ac.ui.cs.advprog.beauthuserstaff.service;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
 import id.ac.ui.cs.advprog.beauthuserstaff.repository.AnnouncementRepository;
-import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementService;
 import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.AnnouncementServiceImpl;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,24 +11,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class AnnouncementServiceImplTest {
+class AnnouncementServiceImplTest {
 
 
     @InjectMocks
@@ -44,7 +36,7 @@ public class AnnouncementServiceImplTest {
 
     @BeforeEach
     void setUp(){
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         announcements = new ArrayList<>();
         announcementService = new AnnouncementServiceImpl();
 
@@ -84,10 +76,9 @@ public class AnnouncementServiceImplTest {
     @Test
     void testGetAllAnnouncements() {
         List<Announcement> expectedAnnouncements = new ArrayList<>();
-        expectedAnnouncements.add(new Announcement());
-        expectedAnnouncements.add(new Announcement());
-        expectedAnnouncements.add(new Announcement());
-        CompletableFuture<List<Announcement>> completedFuture = CompletableFuture.completedFuture(expectedAnnouncements);
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
         when(announcementRepository.getAllAnnouncements()).thenReturn(expectedAnnouncements);
 
         List<Announcement> foundAnnouncements = announcementService.getAllAnnouncements();

@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.beauthuserstaff.repository;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.Announcement;
 import id.ac.ui.cs.advprog.beauthuserstaff.model.AnnouncementBuilder;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class AnnouncementRepositoryTest {
+class AnnouncementRepositoryTest {
 
     @InjectMocks
     AnnouncementRepository announcementRepository;
@@ -51,7 +50,7 @@ public class AnnouncementRepositoryTest {
 
     @Test
     void testAddAndGetAnnouncement(){
-        Announcement announcement = announcements.get(0);
+        Announcement announcement = announcements.getFirst();
         when(entityManager.find(eq(Announcement.class), any())).thenReturn(announcement);
         Announcement result = announcementRepository.addAnnouncement(announcement);
 
@@ -81,13 +80,6 @@ public class AnnouncementRepositoryTest {
         verify(entityManager, Mockito.times(1)).createQuery(anyString());
         verify(query, Mockito.times(1)).setParameter(anyString(), any());
         verify(query, Mockito.times(1)).executeUpdate();
-//        Announcement announcement = announcements.get(0);
-//        announcementRepository.addAnnouncement(announcement);
-//        announcementRepository.deleteAnnouncement(announcement.getId());
-//
-//        assertThrows(IllegalArgumentException.class, () -> {
-//            Announcement foundAnnouncement = announcementRepository.getAnnouncement(announcement.getId());
-//        });
     }
 
 

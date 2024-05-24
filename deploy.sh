@@ -6,6 +6,7 @@ IMAGE_NAME="be-auth-user-staff"
 VERSION=$1
 CONTAINER_NAME="be-auth-user-staff"
 VERSION_FILE="current_version.txt"
+UPDATE_VERSION_FILE=$2
 
 # Function to deploy a specific version
 deploy_version() {
@@ -24,13 +25,16 @@ deploy_version() {
   # Run the new container
   sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $PROJECT_ID/$IMAGE_NAME:$VERSION
 
-  # Save the current version to a file
-  echo $VERSION > $VERSION_FILE
+  # Save the current version to a file if the second argument is "latest"
+  if [ "$UPDATE_VERSION_FILE" = "latest" ]; then
+    echo "Saving current version to file..."
+    echo $VERSION > $VERSION_FILE
+  fi
 }
 
 # Main script logic
 if [ -z "$VERSION" ]; then
-  echo "Please provide the version to deploy. Usage: ./deploy.sh <version>"
+  echo "Please provide the version to deploy. Usage: ./deploy.sh <version> [latest]"
   exit 1
 fi
 

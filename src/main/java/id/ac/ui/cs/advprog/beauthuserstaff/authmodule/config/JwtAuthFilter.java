@@ -17,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
-import java.security.Security;
 
 @Component
 @RequiredArgsConstructor

@@ -3,24 +3,30 @@ package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import io.jsonwebtoken.*;
 
 @Primary
 @Component
@@ -28,8 +34,17 @@ import java.util.function.Function;
 public class JWTserviceimpl implements JWTservice {
 
     @Value("${jwt.secret}")
-    private String secretKey = "6o0fY3XZm6vcwmuOalTRZvMZmJ31DO2NyOSjJoj4XRwz7uGI8FAQ5kELHS+pmAD+i9idb7Sg8uigefSVAfwBXA==";
+    private String secretKey;
+    private JwtParser jwtParser;
     private UserRepository userRepository;
+
+    @PostConstruct
+    public void init(){
+        this.jwtParser = Jwts.parserBuilder()
+                .setSigningKey(Base64.getDecoder().decode(secretKey))
+                .build();
+    }
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;

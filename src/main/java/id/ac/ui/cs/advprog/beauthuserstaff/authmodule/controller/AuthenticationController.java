@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignInRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignUpRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthService;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.ResponseHandler;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,16 @@ public class AuthenticationController  {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
+        try {
+            JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
+            return ResponseEntity.ok(response);
+        } catch (ExpiredJwtException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String token) {

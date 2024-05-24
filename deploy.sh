@@ -5,6 +5,7 @@ PROJECT_ID="dawananonli"
 IMAGE_NAME="be-auth-user-staff"
 VERSION=$1
 CONTAINER_NAME="be-auth-user-staff"
+VERSION_FILE="current_version.txt"
 
 # Function to deploy a specific version
 deploy_version() {
@@ -22,6 +23,9 @@ deploy_version() {
 
   # Run the new container
   sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $PROJECT_ID/$IMAGE_NAME:$VERSION
+
+  # Save the current version to a file
+  echo $VERSION > $VERSION_FILE
 }
 
 # Main script logic

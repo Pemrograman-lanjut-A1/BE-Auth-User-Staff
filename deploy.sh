@@ -5,7 +5,7 @@ PROJECT_ID="dawananonli"
 IMAGE_NAME="be-auth-user-staff"
 VERSION=$1
 CONTAINER_NAME="be-auth-user-staff"
-VERSION_FILE="current_version.txt"
+VERSION_FILE="/home/joel_rompis/current_version.txt"
 UPDATE_VERSION_FILE=$2
 
 # Function to deploy a specific version

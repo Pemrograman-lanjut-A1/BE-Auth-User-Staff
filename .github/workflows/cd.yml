@@ -105,8 +105,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg PRODUCTION=$PRODUCTION --build-arg JDBC_DATABASE_PASSWORD=$JDBC_DATABASE_PASSWORD --build-arg JDBC_DATABASE_URL=$JDBC_DATABASE_URL --build-arg JDBC_DATABASE_USERNAME=$JDBC_DATABASE_USERNAME -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
-          docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+          IMAGE_TAG=${{ github.sha }}
+          docker build --build-arg PRODUCTION=$PRODUCTION --build-arg JDBC_DATABASE_PASSWORD=$JDBC_DATABASE_PASSWORD --build-arg JDBC_DATABASE_URL=$JDBC_DATABASE_URL --build-arg JDBC_DATABASE_USERNAME=$JDBC_DATABASE_USERNAME -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:latest .
+          docker tag ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:latest ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:$IMAGE_TAG
+          docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:latest
+          docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:$IMAGE_TAG
 
   deploy:
     name: Deploy to GCP
@@ -119,10 +122,10 @@ jobs:
       - name: Install SSH client
         run: sudo apt-get install openssh-client
 
-      - name: create ssh key
+      - name: Create SSH key
         run: echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
 
-      - name: update permission
+      - name: Update permission
         run: chmod 400 ssh-key.pem
 
       - name: Create env file
@@ -130,12 +133,13 @@ jobs:
           cat << EOF > .env
           REGISTRY_USER=${{ secrets.REGISTRY_USER }}
           IMAGE_NAME=${{ secrets.IMAGE_NAME }}
-          IMAGE_TAG=${{ secrets.IMAGE_TAG }}
+          IMAGE_TAG=${{ github.sha }}
           EOF
 
       - name: Deploy to GCP
         run: |
-          scp -o StrictHostKeyChecking=no -i ssh-key.pem -r ./.env ./docker-compose.yml ./monitoring ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }}:~/
+          scp -o StrictHostKeyChecking=no -i ssh-key.pem deploy.sh rollback.sh ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }}:~
           ssh -o StrictHostKeyChecking=no -i ssh-key.pem ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
-            sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }};
-            sudo docker compose up -d"
+            chmod +x deploy.sh rollback.sh;
+            ./deploy.sh ${{ github.sha }}
+          "

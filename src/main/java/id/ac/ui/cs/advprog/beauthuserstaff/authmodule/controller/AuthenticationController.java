@@ -24,11 +24,14 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8080", " http://34.142.244.77"})
 public class AuthenticationController  {
+    private AuthService authService;
 
     @Autowired
-    private final AuthService authService;
+    public AuthenticationController(AuthService authService){
+        this.authService = authService;
+    }
 
     @PostMapping("/signup")
     public CompletableFuture<ResponseEntity<Object>> signUp(@RequestBody SignUpRequest signUpRequest) throws JsonProcessingException {
@@ -57,12 +60,12 @@ public class AuthenticationController  {
         }
     }
 
-
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String token) {
+    public ResponseEntity<Object> logout(@RequestHeader(value = "Authorization", required = false) String token) {
         Map<String, Object> response = new HashMap<>();
         ResponseHandler.generateLogoutResponse(token, response);
         return ResponseHandler.generateResponse((String) response.get("message"),
                 (HttpStatus) response.get("status"), response);
     }
+
 }

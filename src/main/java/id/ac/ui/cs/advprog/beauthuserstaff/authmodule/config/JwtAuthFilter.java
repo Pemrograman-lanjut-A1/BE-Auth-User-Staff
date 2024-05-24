@@ -62,17 +62,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     public String filterToken(String token) {
-        System.out.println("token" + token);
         String accessToken = jwtService.resolveToken(token);
 
-        System.out.println("Access token " + accessToken);
         if (accessToken == null) {
             return null;
         }
 
         Claims claims = jwtService.resolveClaims(token);
 
-        System.out.println("claims " + claims);
         if (claims != null && jwtService.validateClaims(claims)) {
             return claims.get("Role").toString();
         }

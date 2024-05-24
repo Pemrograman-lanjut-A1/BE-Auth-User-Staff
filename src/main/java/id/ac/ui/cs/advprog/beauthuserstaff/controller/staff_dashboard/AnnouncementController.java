@@ -75,8 +75,7 @@ public class AnnouncementController {
         }
         List<Announcement> announcementList = announcementService.getAllAnnouncements();
 
-        // Sort the list by creationTimestamp in descending order
-        announcementList.sort(Comparator.comparing(Announcement::getCreationTimestamp).reversed());
+
 
         // Configure the ObjectMapper
         ObjectMapper mapper = new ObjectMapper();

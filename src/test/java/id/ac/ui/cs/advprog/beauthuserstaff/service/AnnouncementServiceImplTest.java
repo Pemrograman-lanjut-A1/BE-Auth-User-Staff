@@ -76,9 +76,9 @@ class AnnouncementServiceImplTest {
     @Test
     void testGetAllAnnouncements() {
         List<Announcement> expectedAnnouncements = new ArrayList<>();
-        expectedAnnouncements.add(new Announcement());
-        expectedAnnouncements.add(new Announcement());
-        expectedAnnouncements.add(new Announcement());
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
+        expectedAnnouncements.add(new AnnouncementBuilder().content("hello").build());
         when(announcementRepository.getAllAnnouncements()).thenReturn(expectedAnnouncements);
 
         List<Announcement> foundAnnouncements = announcementService.getAllAnnouncements();

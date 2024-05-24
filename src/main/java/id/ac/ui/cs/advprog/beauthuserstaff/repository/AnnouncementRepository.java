@@ -41,7 +41,7 @@ public class AnnouncementRepository {
 
     @Transactional
     public List<Announcement> getAllAnnouncements(){
-        return entityManager.createQuery("SELECT a FROM announcement a ORDER BY a.creationTimestamp DESC", Announcement.class)
+        return entityManager.createQuery("SELECT a FROM announcement a", Announcement.class)
                 .getResultList();
     }
 }

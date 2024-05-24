@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin(origins = {"http://localhost:8080", " http://34.142.244.77"})
+@CrossOrigin(origins = {"http://localhost:8080", " http://34.142.244.77", "https://fe-repo-inky.vercel.app"})
 public class AuthenticationController  {
     private AuthService authService;
 

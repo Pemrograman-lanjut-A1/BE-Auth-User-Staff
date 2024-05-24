@@ -29,7 +29,7 @@ public class AuthenticationController  {
     private AuthService authService;
 
     @Autowired
-    private AuthenticationController(AuthService authService){
+    public AuthenticationController(AuthService authService){
         this.authService = authService;
     }
 

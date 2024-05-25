@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config;
 
-import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.enums.UserType;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

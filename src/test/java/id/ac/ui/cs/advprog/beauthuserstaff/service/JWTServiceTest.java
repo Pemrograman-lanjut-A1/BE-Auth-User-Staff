@@ -1,36 +1,31 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.service;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.enums.UserType;
+import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
-import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthService;
-import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthServiceImpl;
-import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTservice;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultClaims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JWTServiceTest {
+public class JWTServiceTest {
 
     @InjectMocks
     private JWTserviceimpl jwtService;
@@ -39,67 +34,85 @@ class JWTServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private AuthServiceImpl authService;
+    private UserDetails userDetails;
 
-
-    @Value("${jwt.secret}")
     private String secretKey = "6o0fY3XZm6vcwmuOalTRZvMZmJ31DO2NyOSjJoj4XRwz7uGI8FAQ5kELHS+pmAD+i9idb7Sg8uigefSVAfwBXA==";
+    private String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
+        ReflectionTestUtils.setField(jwtService, "secretKey", encodedSecretKey);
+        jwtService.init();
     }
 
     @Test
-    void generateTokenSuccess() throws ExecutionException, InterruptedException {
+    public void testGenerateToken() throws Exception {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setUserid(String.valueOf(1L));
+        user.setType(UserType.REGULAR);
 
-        String userId = "1";
-        String userEmail = "test@exam.com";
-        String userType = "REGULAR";
-        String username = "test";
-        String password = "password";
-
-        UserDetails userDetails = new User(username, password, new ArrayList<>());
-
-        id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User user = new id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User();
-        user.setEmail(userEmail);
-        user.setUserid(userId);
-        user.setType(UserType.valueOf(userType));
-
-        when(userRepository.findByEmail(userDetails.getUsername())).thenReturn(Optional.of(user));
+        when(userDetails.getUsername()).thenReturn("test@example.com");
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
 
         CompletableFuture<String> tokenFuture = jwtService.generateToken(userDetails);
-
         String token = tokenFuture.get();
 
         assertNotNull(token);
     }
 
     @Test
-    void generateTokenUserNotFound() throws ExecutionException, InterruptedException {
-        String username = "test";
-        UserDetails userDetails = new User(username, "password", new ArrayList<>());
+    public void testGenerateRefreshToken() throws Exception {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("extra", "claim");
 
-        when(userRepository.findByEmail(username)).thenReturn(Optional.empty());
+        when(userDetails.getUsername()).thenReturn("test@example.com");
 
-        CompletableFuture<String> tokenFuture = jwtService.generateToken(userDetails);
+        CompletableFuture<String> tokenFuture = jwtService.generateRefreshToken(extraClaims, userDetails);
+        String token = tokenFuture.get();
 
-        assertNull(tokenFuture.get());
+        assertNotNull(token);
     }
 
     @Test
-    void generateRefreshTokenSuccess() throws ExecutionException, InterruptedException {
-        String username = "test";
-        UserDetails userDetails = new User(username, "password", new ArrayList<>());
-        Map<String, Object> extraClaims = new HashMap<>();
+    public void testExtractUsername() {
+        String token = Jwts.builder().setSubject("test@example.com")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .signWith(jwtService.getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
 
-        CompletableFuture<String> refreshTokenFuture = jwtService.generateRefreshToken(extraClaims, userDetails);
-
-        String refreshToken = refreshTokenFuture.get();
-
-        assertNotNull(refreshToken);
-        assertFalse(refreshToken.isEmpty());
+        String username = jwtService.extractUsername(token);
+        assertEquals("test@example.com", username);
     }
 
-}
+    @Test
+    public void testIsTokenValid() {
+        String token = Jwts.builder().setSubject("test@example.com")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .signWith(jwtService.getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
 
+        when(userDetails.getUsername()).thenReturn("test@example.com");
+
+        boolean isValid = jwtService.isTokenValid(token, userDetails);
+        assertTrue(isValid);
+    }
+
+    @Test
+    public void testResolveToken() {
+        String bearerToken = "Bearer test-token";
+        String token = jwtService.resolveToken(bearerToken);
+        assertEquals("test-token", token);
+    }
+
+    @Test
+    public void testValidateClaims() {
+        Claims claims = new DefaultClaims();
+        claims.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24));
+
+        boolean isValid = jwtService.validateClaims(claims);
+        assertTrue(isValid);
+    }
+}

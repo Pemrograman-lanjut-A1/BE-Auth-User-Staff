@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -18,13 +19,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-
-import io.jsonwebtoken.*;
 
 @Primary
 @Component
@@ -32,18 +32,20 @@ import io.jsonwebtoken.*;
 public class JWTserviceimpl implements JWTservice {
 
     @Value("${jwt.secret}")
-    private String secretKey = "6o0fY3XZm6vcwmuOalTRZvMZmJ31DO2NyOSjJoj4XRwz7uGI8FAQ5kELHS+pmAD+i9idb7Sg8uigefSVAfwBXA==";
+    private String secretKey;
+    private JwtParser jwtParser;
     private UserRepository userRepository;
     private static final String BEARERPREFIX = "Bearer ";
 
-    private final JwtParser jwtParser;
-
-    public JWTserviceimpl() {
-        this.jwtParser = Jwts.parser().setSigningKey(secretKey);
+    @PostConstruct
+    public void init(){
+        this.jwtParser = Jwts.parserBuilder()
+                .setSigningKey(Base64.getDecoder().decode(secretKey))
+                .build();
     }
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
+    public JWTserviceimpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
     @Override
@@ -82,7 +84,7 @@ public class JWTserviceimpl implements JWTservice {
         final Claims claims = extractAllClaims(token);
         return claimResolvers.apply(claims);
     }
-    private Key getSignInKey(){
+    public Key getSignInKey(){
         byte[] key = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(key);
     }
@@ -111,7 +113,6 @@ public class JWTserviceimpl implements JWTservice {
         }
         return null;
     }
-
     public String resolveToken(String bearerToken) {
 
         if (bearerToken != null && bearerToken.startsWith(BEARERPREFIX)) {
@@ -119,9 +120,7 @@ public class JWTserviceimpl implements JWTservice {
         }
         return null;
     }
-
     public boolean validateClaims(Claims claims) throws AuthenticationException {
         return claims.getExpiration().after(new Date());
     }
-
 }

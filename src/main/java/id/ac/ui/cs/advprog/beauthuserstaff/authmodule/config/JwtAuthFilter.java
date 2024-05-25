@@ -18,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
-import java.security.Security;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JWTserviceimpl jwtService;
     private final UserService userService;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
@@ -63,17 +62,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     public String filterToken(String token) {
-        System.out.println("token" + token);
         String accessToken = jwtService.resolveToken(token);
 
-        System.out.println("Access token " + accessToken);
         if (accessToken == null) {
             return null;
         }
 
         Claims claims = jwtService.resolveClaims(token);
 
-        System.out.println("claims " + claims);
         if (claims != null && jwtService.validateClaims(claims)) {
             return claims.get("Role").toString();
         }

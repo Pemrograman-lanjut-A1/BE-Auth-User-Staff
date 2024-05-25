@@ -69,10 +69,7 @@ public class AnnouncementController {
     }
 
     @GetMapping("/get-all-announcements")
-    public String getAllAnnouncements(@RequestHeader(value = "Authorization") String token) throws JsonProcessingException {
-        if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)) {
-            return FORBIDDEN_MESSAGE;
-        }
+    public String getAllAnnouncements() throws JsonProcessingException {
         List<Announcement> announcementList = announcementService.getAllAnnouncements();
 
         // Configure the ObjectMapper

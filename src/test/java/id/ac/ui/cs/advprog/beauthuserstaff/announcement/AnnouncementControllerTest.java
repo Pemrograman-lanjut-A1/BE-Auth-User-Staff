@@ -89,24 +89,9 @@ class AnnouncementControllerTest {
         announcementList.add(announcement2);
 
         when(announcementService.getAllAnnouncements()).thenReturn(announcementList);
-        when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
 
-        announcementController.getAllAnnouncements("token");
-        verify(jwtAuthFilter, times(1)).filterToken("token");
+        announcementController.getAllAnnouncements();
         verify(announcementService, times(1)).getAllAnnouncements();
     }
 
-    @Test
-    void testGetAllAnnouncementsRoleNull() throws JsonProcessingException {
-        when(jwtAuthFilter.filterToken("token")).thenReturn(null);
-        String result = announcementController.getAllAnnouncements("token");
-        assertEquals(result,"You are not authorized to make this request");
-    }
-
-    @Test
-    void testGetAllAnnouncementsWrongRole() throws JsonProcessingException {
-        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
-        String result = announcementController.getAllAnnouncements("token");
-        assertEquals(result,"You are not authorized to make this request");
-    }
 }

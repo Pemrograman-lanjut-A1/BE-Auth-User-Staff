@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @ExtendWith(MockitoExtension.class)
-public class JWTServiceTest {
+class JWTServiceTest {
 
     @InjectMocks
     private JWTserviceimpl jwtService;

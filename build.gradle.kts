@@ -64,15 +64,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
 
     runtimeOnly("org.postgresql:postgresql")
-
-
-
-
-
-
-
-
-
 }
 
 tasks.register<Test>("unitTest"){

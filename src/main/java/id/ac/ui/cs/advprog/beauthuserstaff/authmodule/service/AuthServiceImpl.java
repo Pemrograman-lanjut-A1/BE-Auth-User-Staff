@@ -63,6 +63,7 @@ public class AuthServiceImpl implements AuthService{
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null));
         } catch (InterruptedException | JsonProcessingException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             return CompletableFuture.completedFuture(ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null));
@@ -71,7 +72,7 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     @Async
-    public CompletableFuture<ResponseEntity<Object>> signIn(SignInRequest signInRequest) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public CompletableFuture<ResponseEntity<Object>> signIn(SignInRequest signInRequest) throws ExecutionException, InterruptedException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     signInRequest.getEmail(), signInRequest.getPassword()));
@@ -85,7 +86,7 @@ public class AuthServiceImpl implements AuthService{
         return CompletableFuture.completedFuture(generateUserLoginResponse(user));
     }
 
-    public ResponseEntity<Object> signUpStaff(SignUpRequest signUpRequest) throws JsonProcessingException {
+    public ResponseEntity<Object> signUpStaff(SignUpRequest signUpRequest) {
         try {
             if (!isPasswordValid(signUpRequest.getPassword())) {
                 return generateSignUpError();
@@ -106,20 +107,21 @@ public class AuthServiceImpl implements AuthService{
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null);
         }catch (InterruptedException | JsonProcessingException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             return ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
-    public ResponseEntity<Object> generateUserLoginResponse(User user) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public ResponseEntity<Object> generateUserLoginResponse(User user) throws ExecutionException, InterruptedException {
         return AuthResponseUtil.generateUserLoginResponse(user, jwtService);
     }
 
     public ResponseEntity<Object> generateUserSignUpResponse(User user) throws JsonProcessingException, ExecutionException, InterruptedException {
         return AuthResponseUtil.generateUserSignUpResponse(user, jwtService);
     }
-    public ResponseEntity<Object> generateSignInError()throws JsonProcessingException{
+    public ResponseEntity<Object> generateSignInError(){
         return ResponseHandler.generateResponse(
                 "Invalid email or password",
                 HttpStatus.UNAUTHORIZED, null);

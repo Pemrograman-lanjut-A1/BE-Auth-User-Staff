@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.enums.UserType;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;

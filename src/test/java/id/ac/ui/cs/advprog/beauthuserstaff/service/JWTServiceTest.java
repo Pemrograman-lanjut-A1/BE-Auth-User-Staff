@@ -8,7 +8,6 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;

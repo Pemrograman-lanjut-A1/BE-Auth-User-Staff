@@ -19,7 +19,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -27,180 +28,238 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class AuthServiceTest {
+class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private JWTservice jwTservice;
+    private JWTservice jwtService;
 
     @InjectMocks
     private AuthServiceImpl authService;
 
-    @Mock
-    private  PasswordEncoder passwordEncoder;
+    private SignUpRequest validSignUpRequest;
+    private SignUpRequest invalidSignUpRequest;
+    private SignInRequest validSignInRequest;
+    private SignInRequest invalidSignInRequest;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        validSignUpRequest = new SignUpRequest();
+        validSignUpRequest.setEmail("test@email.com");
+        validSignUpRequest.setUsername("testUsername");
+        validSignUpRequest.setPassword("ValidPassword123!");
+
+        invalidSignUpRequest = new SignUpRequest();
+        invalidSignUpRequest.setEmail("test@email.com");
+        invalidSignUpRequest.setUsername("testUsername");
+        invalidSignUpRequest.setPassword("invalid");
+
+        validSignInRequest = new SignInRequest();
+        validSignInRequest.setEmail("test@email.com");
+        validSignInRequest.setPassword("validPassword");
+
+        invalidSignInRequest = new SignInRequest();
+        invalidSignInRequest.setEmail("test@email.com");
+        invalidSignInRequest.setPassword("invalidPassword");
     }
 
     @Test
-    void signInSuccess() throws ExecutionException, JsonProcessingException, InterruptedException {
-        SignInRequest signInRequest = new SignInRequest();
-        signInRequest.setEmail("test@example.com");
-        signInRequest.setPassword("password");
-
-        User user = new User();
-        user.setType(UserType.REGULAR);
-        when(userRepository.findByEmail(signInRequest.getEmail())).thenReturn(Optional.of(user));
-
-        String mockToken = "mockedToken";
-        CompletableFuture<String> mockTokenFuture = CompletableFuture.completedFuture(mockToken);
-        when(jwTservice.generateToken(any(UserDetails.class))).thenReturn(mockTokenFuture);
-
-        ResponseEntity<Object> responseEntity = authService.signIn(signInRequest).join();
-
-        assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
-    }
-
-    @Test
-    void signInInvalidCredentials() throws ExecutionException, JsonProcessingException, InterruptedException {
-        SignInRequest signInRequest = new SignInRequest();
-        signInRequest.setEmail("test@example.com");
-        signInRequest.setPassword("wrongpassword");
-
-        when(userRepository.findByEmail(signInRequest.getEmail())).thenReturn(Optional.empty());
-
-        ResponseEntity<Object> responseEntity = authService.signIn(signInRequest).join();
-
-        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
-    }
-
-    @Test
-    void signInUserNotFound() throws ExecutionException, JsonProcessingException, InterruptedException {
-        SignInRequest signInRequest = new SignInRequest();
-        signInRequest.setEmail("nonexistent@example.com");
-        signInRequest.setPassword("wrongpassword");
-
-        when(userRepository.findByEmail(signInRequest.getEmail())).thenReturn(Optional.empty());
-
-        ResponseEntity<Object> responseEntity = authService.signIn(signInRequest).join();
-
-        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
-    }
-
-    @Test
-    void signUp_InvalidPassword_BadRequestResponse() throws Exception {
-        SignUpRequest signUpRequest = new SignUpRequest();
-        signUpRequest.setUsername("testuser");
-        signUpRequest.setEmail("test@example.com");
-        signUpRequest.setPassword("weak");
-
-        CompletableFuture<ResponseEntity<Object>> futureResponse = authService.signUp(signUpRequest);
-        ResponseEntity<Object> response = futureResponse.get();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    void signUp_DuplicateEmail_BadRequestResponse() throws Exception {
-        SignUpRequest signUpRequest = new SignUpRequest();
-        signUpRequest.setUsername("testuser");
-        signUpRequest.setEmail("existing@example.com");
-        signUpRequest.setPassword("Password123!");
-
-        when(userRepository.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
-
-        CompletableFuture<ResponseEntity<Object>> futureResponse = authService.signUp(signUpRequest);
-        ResponseEntity<Object> response = futureResponse.get();
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    void signIn_NonexistentEmail_BadRequestResponse() throws Exception {
-        SignInRequest signInRequest = new SignInRequest();
-        signInRequest.setEmail("nonexistent@example.com");
-        signInRequest.setPassword("Password123!");
-
-        when(userRepository.findByEmail(signInRequest.getEmail())).thenReturn(Optional.empty());
-
-        CompletableFuture<ResponseEntity<Object>> futureResponse = authService.signIn(signInRequest);
-        ResponseEntity<Object> response = futureResponse.get();
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-    }
-    @Test
-    void refreshToken_ValidRequest_SuccessfulResponse() throws Exception {
-        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
-        refreshTokenRequest.setToken("valid_token");
-
+    void signUp_Success() throws ExecutionException, InterruptedException {
         User user = User.builder()
-                .email("test@example.com")
-                .username("testuser")
-                .password("password")
-                .type(UserType.REGULAR)
+                .email(validSignUpRequest.getEmail())
+                .username(validSignUpRequest.getUsername())
                 .build();
+        when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(jwtService.generateToken(any(User.class))).thenReturn(CompletableFuture.completedFuture("mockToken"));
 
-        when(jwTservice.extractUsername(refreshTokenRequest.getToken())).thenReturn(user.getEmail());
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(jwTservice.isTokenValid(refreshTokenRequest.getToken(), user)).thenReturn(true);
-        CompletableFuture<String> futureToken = CompletableFuture.completedFuture("new_token");
-        when(jwTservice.generateToken(user)).thenReturn(futureToken);
+        CompletableFuture<ResponseEntity<Object>> result = authService.signUp(validSignUpRequest);
 
-        futureToken.join();
-
-        JwtAuthResponse expectedResponse = new JwtAuthResponse();
-        expectedResponse.setToken("new_token");
-        expectedResponse.setRefreshToken(refreshTokenRequest.getToken());
-
-        JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
-
-        assertEquals(expectedResponse, response);
-    }
-
-    @Test
-    void refreshToken_InvalidToken_NullResponse() throws Exception {
-        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
-        refreshTokenRequest.setToken("invalid_token");
-
-        when(jwTservice.extractUsername(refreshTokenRequest.getToken())).thenThrow(new RuntimeException());
-
-        JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
-
-        assertNull(response);
+        assertNotNull(result);
+        assertEquals(HttpStatus.CREATED, result.get().getStatusCode());
     }
 
 
     @Test
-    void refreshToken_ValidTokenAndUser_ValidResponse() throws Exception {
-        String email = "user@example.com";
-        String token = "valid_token";
+    void signUp_InvalidPassword() throws ExecutionException, InterruptedException {
+        CompletableFuture<ResponseEntity<Object>> result = authService.signUp(invalidSignUpRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.BAD_REQUEST, result.get().getStatusCode());
+    }
+
+    @Test
+    void signUp_EmailAlreadyInUse() throws ExecutionException, InterruptedException {
+        when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenThrow(new DataIntegrityViolationException("Email is already in used"));
+
+        CompletableFuture<ResponseEntity<Object>> result = authService.signUp(validSignUpRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.BAD_REQUEST, result.get().getStatusCode());
+    }
+
+    @Test
+    void signIn_Success() throws ExecutionException, InterruptedException {
+        User user = User.builder()
+                .email(validSignInRequest.getEmail())
+                .type(UserType.REGULAR)
+                .password(passwordEncoder.encode(validSignInRequest.getPassword()))
+                .build();
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(any(User.class))).thenReturn(CompletableFuture.completedFuture("mockToken"));
+
+        CompletableFuture<ResponseEntity<Object>> result = authService.signIn(validSignInRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.ACCEPTED, result.get().getStatusCode());
+    }
+
+    @Test
+    void signIn_InvalidCredentials() throws ExecutionException, InterruptedException {
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Invalid credentials"));
+
+        CompletableFuture<ResponseEntity<Object>> result = authService.signIn(invalidSignInRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.UNAUTHORIZED, result.get().getStatusCode());
+    }
+
+    @Test
+    void signIn_UserNotFound() throws ExecutionException, InterruptedException {
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+
+        CompletableFuture<ResponseEntity<Object>> result = authService.signIn(validSignInRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.UNAUTHORIZED, result.get().getStatusCode());
+    }
+
+    @Test
+    void signUpStaff_Success()  {
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setEmail("staff@email.com");
+        signUpRequest.setUsername("staffUsername");
+        signUpRequest.setPassword("ValidPassword123!");
+        User user = User.builder()
+                .email(signUpRequest.getEmail())
+                .username(signUpRequest.getUsername())
+                .type(UserType.STAFF)
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .build();
+        when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(jwtService.generateToken(any(User.class))).thenReturn(CompletableFuture.completedFuture("mockToken"));
+
+        ResponseEntity<Object> result = authService.signUpStaff(signUpRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+    }
+
+    @Test
+    void signUpStaff_InvalidPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setEmail("staff@email.com");
+        signUpRequest.setUsername("staffUsername");
+        signUpRequest.setPassword("invalid");
+
+        ResponseEntity<Object> result = authService.signUpStaff(signUpRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+    }
+
+    @Test
+    void signUpStaff_EmailAlreadyInUse() throws JsonProcessingException, ExecutionException, InterruptedException {
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setEmail("staff@email.com");
+        signUpRequest.setUsername("staffUsername");
+        signUpRequest.setPassword("ValidPassword123!");
+        when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenThrow(new DataIntegrityViolationException("Email is already in used"));
+
+        ResponseEntity<Object> result = authService.signUpStaff(signUpRequest);
+
+        assertNotNull(result);
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+    }
+
+    @Test
+    void refreshToken_Success() {
+        String token = "validRefreshToken";
+        String email = "test@email.com";
         RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
         refreshTokenRequest.setToken(token);
-
-        when(jwTservice.extractUsername(refreshTokenRequest.getToken())).thenReturn(email);
-
         User user = User.builder().email(email).build();
+        when(jwtService.extractUsername(token)).thenReturn(email);
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(jwtService.isTokenValid(token, user)).thenReturn(true);
+        when(jwtService.generateToken(user)).thenReturn(CompletableFuture.completedFuture("newJwtToken"));
 
-        CompletableFuture<String> tokenFuture = CompletableFuture.completedFuture(token);
-        when(jwTservice.generateToken(user)).thenReturn(tokenFuture);
+        JwtAuthResponse result = authService.refreshToken(refreshTokenRequest);
 
-        when(jwTservice.isTokenValid(refreshTokenRequest.getToken(), user)).thenReturn(true);
+        assertNotNull(result);
+        assertEquals("newJwtToken", result.getToken());
+        assertEquals(token, result.getRefreshToken());
+    }
 
-        JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
+    @Test
+    void refreshToken_InvalidToken() {
+        String token = "invalidRefreshToken";
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+        refreshTokenRequest.setToken(token);
+        when(jwtService.extractUsername(token)).thenReturn(null);
 
-        assertNotNull(response);
+        JwtAuthResponse result = authService.refreshToken(refreshTokenRequest);
+
+        assertNull(result);
+    }
+
+    @Test
+    void refreshToken_UserNotFound() {
+        String token = "validRefreshToken";
+        String email = "test@email.com";
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+        refreshTokenRequest.setToken(token);
+        when(jwtService.extractUsername(token)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        JwtAuthResponse result = authService.refreshToken(refreshTokenRequest);
+
+        assertNull(result);
+    }
+
+    @Test
+    void refreshToken_TokenNotValid() {
+        String token = "validRefreshToken";
+        String email = "test@email.com";
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+        refreshTokenRequest.setToken(token);
+        User user = User.builder().email(email).build();
+        when(jwtService.extractUsername(token)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(jwtService.isTokenValid(token, user)).thenReturn(false);
+
+        JwtAuthResponse result = authService.refreshToken(refreshTokenRequest);
+
+        assertNull(result);
     }
 
 }
-

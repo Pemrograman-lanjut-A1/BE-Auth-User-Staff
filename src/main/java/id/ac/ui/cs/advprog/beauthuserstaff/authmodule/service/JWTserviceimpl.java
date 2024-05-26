@@ -57,7 +57,7 @@ public class JWTserviceimpl implements JWTservice {
         }
         User user = userOptional.get();
         String token = Jwts.builder().setSubject(user.getEmail())
-                .claim("Id", user.getUserid())
+                .claim("Id", user.getUserId())
                 .claim("Role", user.getType().name())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))

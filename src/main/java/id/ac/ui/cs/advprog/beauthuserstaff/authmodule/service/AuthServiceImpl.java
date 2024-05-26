@@ -10,10 +10,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.AuthResponseUtil;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.ResponseHandler;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -59,7 +54,7 @@ public class AuthServiceImpl implements AuthService{
                     .password(passwordEncoder.encode(signUpRequest.getPassword()))
                     .type(UserType.REGULAR)
                     .build();
-            user.setUserid(id);
+            user.setUserId(id);
             userRepository.save(user);
 
             return CompletableFuture.completedFuture(generateUserSignUpResponse(user));
@@ -67,8 +62,8 @@ public class AuthServiceImpl implements AuthService{
             return CompletableFuture.completedFuture(ResponseHandler.generateResponse(
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (InterruptedException | JsonProcessingException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             return CompletableFuture.completedFuture(ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null));
@@ -77,7 +72,7 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     @Async
-    public CompletableFuture<ResponseEntity<Object>> signIn(SignInRequest signInRequest) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public CompletableFuture<ResponseEntity<Object>> signIn(SignInRequest signInRequest) throws ExecutionException, InterruptedException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     signInRequest.getEmail(), signInRequest.getPassword()));
@@ -91,7 +86,7 @@ public class AuthServiceImpl implements AuthService{
         return CompletableFuture.completedFuture(generateUserLoginResponse(user));
     }
 
-    public ResponseEntity<Object> signUpStaff(SignUpRequest signUpRequest) throws JsonProcessingException {
+    public ResponseEntity<Object> signUpStaff(SignUpRequest signUpRequest) {
         try {
             if (!isPasswordValid(signUpRequest.getPassword())) {
                 return generateSignUpError();
@@ -104,28 +99,29 @@ public class AuthServiceImpl implements AuthService{
                     .type(UserType.STAFF)
                     .build();
 
-            user.setUserid(id);
+            user.setUserId(id);
             userRepository.save(user);
             return generateUserSignUpResponse(user);
         }catch (DataIntegrityViolationException e) {
             return ResponseHandler.generateResponse(
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null);
-        }catch (Exception e) {
+        }catch (InterruptedException | JsonProcessingException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             return ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
-    public ResponseEntity<Object> generateUserLoginResponse(User user) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public ResponseEntity<Object> generateUserLoginResponse(User user) throws ExecutionException, InterruptedException {
         return AuthResponseUtil.generateUserLoginResponse(user, jwtService);
     }
 
     public ResponseEntity<Object> generateUserSignUpResponse(User user) throws JsonProcessingException, ExecutionException, InterruptedException {
         return AuthResponseUtil.generateUserSignUpResponse(user, jwtService);
     }
-    public ResponseEntity<Object> generateSignInError()throws JsonProcessingException{
+    public ResponseEntity<Object> generateSignInError(){
         return ResponseHandler.generateResponse(
                 "Invalid email or password",
                 HttpStatus.UNAUTHORIZED, null);
@@ -141,7 +137,7 @@ public class AuthServiceImpl implements AuthService{
         if (password.length() < 8) {
             return false;
         }
-        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!*()%^&+=])(?=\\S+$).{8,20}$";
+        String regExpn = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!*()%^&+=])(?=\\S+$).{8,20}$";
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();

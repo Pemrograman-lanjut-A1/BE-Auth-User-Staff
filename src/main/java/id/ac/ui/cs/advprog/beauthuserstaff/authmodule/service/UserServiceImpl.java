@@ -1,9 +1,7 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

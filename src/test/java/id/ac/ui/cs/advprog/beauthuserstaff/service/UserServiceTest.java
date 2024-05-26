@@ -45,15 +45,13 @@ class UserServiceTest {
 
     @Test
     void loadUserByUsername_UserNotFound_ThrowUsernameNotFoundException() {
-        // Arrange
         String username = "test@example.com";
-
         when(userRepository.findByEmail(username)).thenReturn(Optional.empty());
 
-        // Act and Assert
-        assertThrows(UsernameNotFoundException.class,
-                () -> userService.userDetailsService().loadUserByUsername(username));
+        var userDetailsService = userService.userDetailsService();
+        assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(username));
 
         verify(userRepository, times(1)).findByEmail(username);
     }
+
 }

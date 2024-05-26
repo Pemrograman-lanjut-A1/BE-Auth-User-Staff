@@ -20,7 +20,7 @@ import java.util.List;
 @Entity(name = "_user")
 public class User implements UserDetails {
     @Id
-    private String Userid;
+    private String userId;
     @Column(unique = true)
     private String username;
     @Column(unique = true)

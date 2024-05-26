@@ -8,8 +8,8 @@ class UserTypeTest {
 
     @Test
     void getUserType_ShouldReturnCorrectType() {
-        assertEquals("STAFF", UserType.STAFF.getUserType());
-        assertEquals("REGULAR", UserType.REGULAR.getUserType());
+        assertEquals("STAFF", UserType.STAFF.getRoleType());
+        assertEquals("REGULAR", UserType.REGULAR.getRoleType());
     }
 
     @Test

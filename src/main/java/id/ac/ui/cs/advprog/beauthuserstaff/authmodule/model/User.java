@@ -18,6 +18,7 @@ import java.util.List;
 @Entity(name = "_user")
 public class User implements UserDetails {
     @Id
+    @Column(name = "user_id")
     private String userId;
     @Column(unique = true)
     private String username;

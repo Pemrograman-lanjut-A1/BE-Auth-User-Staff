@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class AnnouncementTest {
     private Announcement announcement;
@@ -20,7 +18,7 @@ class AnnouncementTest {
     @Test
     void createAnnouncementNoContent(){
         AnnouncementBuilder announcementBuilder = new AnnouncementBuilder();
-        assertThrows(IllegalArgumentException.class, () -> {Announcement announcement1 = announcementBuilder.build();});
+        assertThrows(IllegalArgumentException.class, announcementBuilder::build);
     }
 
     @Test

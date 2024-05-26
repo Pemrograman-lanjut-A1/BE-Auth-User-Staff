@@ -6,14 +6,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 class UserTest {
 
     private User user;
-
     private AutoCloseable closeable;
 
     @BeforeEach
@@ -78,6 +76,24 @@ class UserTest {
 
         assertEquals(user, sameUser);
         assertNotEquals(user, differentUser);
+    }
+
+    @Test
+    void testUserHashCode() {
+        User sameUser = User.builder()
+                .username("john_doe")
+                .email("john@example.com")
+                .password("password123")
+                .type(UserType.REGULAR)
+                .build();
+
+        assertEquals(user.hashCode(), sameUser.hashCode());
+    }
+
+    @Test
+    void testUserToString() {
+        String expectedString = "User(userId=null, username=john@example.com, email=john@example.com, password=password123, type=REGULAR)";
+        assertEquals(expectedString, user.toString());
     }
 
     @AfterEach

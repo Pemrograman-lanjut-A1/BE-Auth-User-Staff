@@ -8,7 +8,6 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTserviceimpl;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -46,10 +45,10 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testGenerateToken() throws Exception {
+    void testGenerateToken() throws Exception {
         User user = new User();
         user.setEmail("test@example.com");
-        user.setUserid(String.valueOf(1L));
+        user.setUserId(String.valueOf(1L));
         user.setType(UserType.REGULAR);
 
         when(userDetails.getUsername()).thenReturn("test@example.com");
@@ -62,7 +61,7 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testGenerateRefreshToken() throws Exception {
+    void testGenerateRefreshToken() throws Exception {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("extra", "claim");
 
@@ -75,7 +74,7 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testExtractUsername() {
+    void testExtractUsername() {
         String token = Jwts.builder().setSubject("test@example.com")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
@@ -87,7 +86,7 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testIsTokenValid() {
+    void testIsTokenValid() {
         String token = Jwts.builder().setSubject("test@example.com")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
@@ -101,14 +100,14 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testResolveToken() {
+    void testResolveToken() {
         String bearerToken = "Bearer test-token";
         String token = jwtService.resolveToken(bearerToken);
         assertEquals("test-token", token);
     }
 
     @Test
-    public void testValidateClaims() {
+    void testValidateClaims() {
         Claims claims = new DefaultClaims();
         claims.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24));
 

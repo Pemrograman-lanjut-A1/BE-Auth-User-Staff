@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
-public class JwtAuthFilterTest {
+class JwtAuthFilterTest {
 
     @InjectMocks
     private JwtAuthFilter jwtAuthFilter;
@@ -62,7 +61,7 @@ public class JwtAuthFilterTest {
     }
 
     @Test
-    public void testDoFilterInternalWithValidToken() throws ServletException, IOException {
+    void testDoFilterInternalWithValidToken() throws ServletException, IOException {
         String token = "Bearer validToken";
         String username = "test@example.com";
 
@@ -78,7 +77,7 @@ public class JwtAuthFilterTest {
     }
 
     @Test
-    public void testDoFilterInternalWithInvalidToken() throws ServletException, IOException {
+    void testDoFilterInternalWithInvalidToken() throws ServletException, IOException {
         String token = "Bearer invalidToken";
 
         when(request.getHeader("Authorization")).thenReturn(token);
@@ -91,7 +90,7 @@ public class JwtAuthFilterTest {
     }
 
     @Test
-    public void testDoFilterInternalWithoutToken() throws ServletException, IOException {
+    void testDoFilterInternalWithoutToken() throws ServletException, IOException {
         when(request.getHeader("Authorization")).thenReturn(null);
 
         jwtAuthFilter.doFilterInternal(request, response, filterChain);
@@ -100,7 +99,7 @@ public class JwtAuthFilterTest {
         verify(filterChain).doFilter(request, response);
     }
     @Test
-    public void testFilterTokenWithInvalidToken() {
+    void testFilterTokenWithInvalidToken() {
         String token = "Bearer invalidToken";
 
         when(jwtService.resolveToken("Bearer invalidToken")).thenReturn(null);

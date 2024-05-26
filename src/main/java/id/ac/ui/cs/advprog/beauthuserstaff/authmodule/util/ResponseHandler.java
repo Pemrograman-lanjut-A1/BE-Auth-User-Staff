@@ -7,10 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResponseHandler {
+
+    private static final String MESSAGE_KEY = "message";
+    private static final String STATUS_KEY = "status";
+    private ResponseHandler() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     public static ResponseEntity<Object> generateResponse(String message, HttpStatus status, Object responseObj) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("message", message);
-        map.put("status", status.value());
+        Map<String, Object> map = new HashMap<>();
+        map.put(MESSAGE_KEY, message);
+        map.put(STATUS_KEY, status.value());
         map.put("data", responseObj);
 
         if (status == HttpStatus.BAD_REQUEST) {
@@ -22,11 +28,11 @@ public class ResponseHandler {
 
     public static void generateLogoutResponse(String token, Map<String, Object> response) {
         if (token == null) {
-            response.put("message", "Token tidak ditemukan.");
-            response.put("status", HttpStatus.BAD_REQUEST);
+            response.put(MESSAGE_KEY, "Token tidak ditemukan.");
+            response.put(STATUS_KEY, HttpStatus.BAD_REQUEST);
         } else {
-            response.put("message", "Berhasil logout");
-            response.put("status", HttpStatus.ACCEPTED);
+            response.put(MESSAGE_KEY, "Berhasil logout");
+            response.put(STATUS_KEY, HttpStatus.ACCEPTED);
         }
     }
 }

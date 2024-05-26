@@ -5,19 +5,19 @@ public enum UserType {
     STAFF("STAFF"),
     REGULAR("REGULAR");
 
-    private final String userType;
+    private final String roleType;
 
-    UserType(String userType) {
-        this.userType = userType;
+    UserType(String roleType) {
+        this.roleType = roleType;
     }
 
-    public String getUserType() {
-        return userType;
+    public String getRoleType() {
+        return roleType;
     }
 
     public static boolean contains(String value) {
         for (UserType userType : values()) {
-            if (userType.getUserType().equals(value)) {
+            if (userType.getRoleType().equals(value)) {
                 return true;
             }
         }

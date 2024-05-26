@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.JwtAuthResponse;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.RefreshTokenRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignInRequest;
@@ -187,7 +186,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void signUpStaff_EmailAlreadyInUse() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void signUpStaff_EmailAlreadyInUse() {
         SignUpRequest signUpRequest = new SignUpRequest();
         signUpRequest.setEmail("staff@email.com");
         signUpRequest.setUsername("staffUsername");
@@ -261,5 +260,4 @@ class AuthServiceTest {
 
         assertNull(result);
     }
-
 }

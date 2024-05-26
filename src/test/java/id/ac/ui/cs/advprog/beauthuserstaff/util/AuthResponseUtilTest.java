@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.enums.UserType;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTservice;
@@ -21,7 +20,7 @@ import static org.mockito.Mockito.when;
 class AuthResponseUtilTest {
 
     @Test
-    void generateUserLoginResponse_RegularUser_ShouldReturnAcceptedResponse() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void generateUserLoginResponse_RegularUser_ShouldReturnAcceptedResponse() throws ExecutionException, InterruptedException {
         User user = new User();
         user.setType(UserType.REGULAR);
         JWTservice jwtService = mock(JWTservice.class);
@@ -38,7 +37,7 @@ class AuthResponseUtilTest {
     }
 
     @Test
-    void generateUserSignUpResponse_StaffUser_ShouldReturnCreatedResponse() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void generateUserSignUpResponse_StaffUser_ShouldReturnCreatedResponse() throws ExecutionException, InterruptedException {
         User user = new User();
         user.setType(UserType.STAFF);
         JWTservice jwtService = mock(JWTservice.class);
@@ -74,7 +73,7 @@ class AuthResponseUtilTest {
 
 
     @Test
-    void generateUserLoginResponse_NullUser_ShouldReturnUnauthorizedResponse() throws ExecutionException, JsonProcessingException, InterruptedException {
+    void generateUserLoginResponse_NullUser_ShouldReturnUnauthorizedResponse() throws ExecutionException, InterruptedException {
         User user = null;
         JWTservice jwtService = mock(JWTservice.class);
 

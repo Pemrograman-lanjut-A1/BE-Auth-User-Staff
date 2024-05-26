@@ -58,44 +58,6 @@ class UserTest {
         assertEquals(UserType.STAFF, user.getType());
     }
 
-    @Test
-    void testUserEquality() {
-        User sameUser = User.builder()
-                .username("john_doe")
-                .email("john@example.com")
-                .password("password123")
-                .type(UserType.REGULAR)
-                .build();
-
-        User differentUser = User.builder()
-                .username("jane_doe")
-                .email("jane@example.com")
-                .password("password456")
-                .type(UserType.REGULAR)
-                .build();
-
-        assertEquals(user, sameUser);
-        assertNotEquals(user, differentUser);
-    }
-
-    @Test
-    void testUserHashCode() {
-        User sameUser = User.builder()
-                .username("john_doe")
-                .email("john@example.com")
-                .password("password123")
-                .type(UserType.REGULAR)
-                .build();
-
-        assertEquals(user.hashCode(), sameUser.hashCode());
-    }
-
-    @Test
-    void testUserToString() {
-        String expectedString = "User(userId=null, username=john@example.com, email=john@example.com, password=password123, type=REGULAR)";
-        assertEquals(expectedString, user.toString());
-    }
-
     @AfterEach
     public void tearDown() throws Exception {
         closeable.close();

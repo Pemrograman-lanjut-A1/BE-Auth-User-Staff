@@ -10,6 +10,7 @@ import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.model.User;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.repository.UserRepository;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthServiceImpl;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.JWTservice;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
-public class AuthServiceTest {
+class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -46,10 +47,11 @@ public class AuthServiceTest {
 
     @Mock
     private  PasswordEncoder passwordEncoder;
+    private AutoCloseable closeable;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class AuthServiceTest {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
     @Test
-    void refreshToken_ValidRequest_SuccessfulResponse() throws Exception {
+    void refreshToken_ValidRequest_SuccessfulResponse() {
         RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
         refreshTokenRequest.setToken("valid_token");
 
@@ -168,7 +170,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void refreshToken_InvalidToken_NullResponse() throws Exception {
+    void refreshToken_InvalidToken_NullResponse() {
         RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
         refreshTokenRequest.setToken("invalid_token");
 
@@ -181,7 +183,7 @@ public class AuthServiceTest {
 
 
     @Test
-    void refreshToken_ValidTokenAndUser_ValidResponse() throws Exception {
+    void refreshToken_ValidTokenAndUser_ValidResponse() {
         String email = "user@example.com";
         String token = "valid_token";
         RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
@@ -200,6 +202,11 @@ public class AuthServiceTest {
         JwtAuthResponse response = authService.refreshToken(refreshTokenRequest);
 
         assertNotNull(response);
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        closeable.close();
     }
 
 }

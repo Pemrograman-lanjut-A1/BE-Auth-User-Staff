@@ -13,14 +13,17 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class AuthResponseUtil {
+    private AuthResponseUtil() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     public static ResponseEntity<Object> generateUserLoginResponse(User user, JWTservice jwTservice)
-            throws JsonProcessingException, ExecutionException, InterruptedException {
+            throws ExecutionException, InterruptedException {
         if(user == null){
             return ResponseHandler.generateResponse("Maaf username atau password tidak sesuai",
                     HttpStatus.UNAUTHORIZED, new HashMap<>());
         }
         Map<String, Object> userData = new ObjectMapper().convertValue(user, Map.class);
-        userData = removeUnusedResponse(userData);
+        removeUnusedResponse(userData);
 
         if (user.getType().toString().equals(UserType.REGULAR.name())){
             Map<String, Object> data = new HashMap<>();
@@ -39,9 +42,9 @@ public class AuthResponseUtil {
     }
 
     public static ResponseEntity<Object> generateUserSignUpResponse(User user, JWTservice jwTservice)
-            throws JsonProcessingException, ExecutionException, InterruptedException {
+            throws ExecutionException, InterruptedException {
         Map<String, Object> userData = new ObjectMapper().convertValue(user, Map.class);
-        userData = removeUnusedResponse(userData);
+        removeUnusedResponse(userData);
 
         if (user.getType().toString().equals(UserType.REGULAR.name())){
             Map<String, Object> data = new HashMap<>();

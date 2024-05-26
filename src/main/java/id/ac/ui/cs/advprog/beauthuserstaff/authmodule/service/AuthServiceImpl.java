@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService{
                     .password(passwordEncoder.encode(signUpRequest.getPassword()))
                     .type(UserType.REGULAR)
                     .build();
-            user.setUserid(id);
+            user.setUserId(id);
             userRepository.save(user);
 
             return CompletableFuture.completedFuture(generateUserSignUpResponse(user));
@@ -67,8 +67,7 @@ public class AuthServiceImpl implements AuthService{
             return CompletableFuture.completedFuture(ResponseHandler.generateResponse(
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (InterruptedException | JsonProcessingException | ExecutionException e) {
             return CompletableFuture.completedFuture(ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null));
@@ -104,14 +103,14 @@ public class AuthServiceImpl implements AuthService{
                     .type(UserType.STAFF)
                     .build();
 
-            user.setUserid(id);
+            user.setUserId(id);
             userRepository.save(user);
             return generateUserSignUpResponse(user);
         }catch (DataIntegrityViolationException e) {
             return ResponseHandler.generateResponse(
                     "Email is already in used",
                     HttpStatus.BAD_REQUEST, null);
-        }catch (Exception e) {
+        }catch (InterruptedException | JsonProcessingException | ExecutionException e) {
             return ResponseHandler.generateResponse(
                     "Failed to register user",
                     HttpStatus.INTERNAL_SERVER_ERROR, null);
@@ -141,7 +140,7 @@ public class AuthServiceImpl implements AuthService{
         if (password.length() < 8) {
             return false;
         }
-        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!*()%^&+=])(?=\\S+$).{8,20}$";
+        String regExpn = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!*()%^&+=])(?=\\S+$).{8,20}$";
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();

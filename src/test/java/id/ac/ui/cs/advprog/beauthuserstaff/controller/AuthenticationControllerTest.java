@@ -1,14 +1,11 @@
 package id.ac.ui.cs.advprog.beauthuserstaff.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.controller.AuthenticationController;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.JwtAuthResponse;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.RefreshTokenRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignInRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.dto.SignUpRequest;
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.service.AuthService;
-import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.util.ResponseHandler;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -59,7 +54,7 @@ class AuthenticationControllerTest {
 
         CompletableFuture<ResponseEntity<Object>> response = authenticationController.signUp(signUpRequest);
 
-        ResponseEntity<Object> responseEntity = response.get(); // This should not be null
+        ResponseEntity<Object> responseEntity = response.get();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Sign up successful", responseEntity.getBody());
     }
@@ -74,8 +69,6 @@ class AuthenticationControllerTest {
 
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("Staff sign up successful");
         when(authService.signUpStaff(signUpRequest)).thenReturn(expectedResponse);
-
-        AuthenticationController authenticationController = new AuthenticationController(authService);
 
         ResponseEntity<Object> response = authenticationController.signUpStaff(signUpRequest);
 
@@ -93,8 +86,6 @@ class AuthenticationControllerTest {
                 CompletableFuture.completedFuture(ResponseEntity.ok("Sign in successful"));
         when(authService.signIn(signInRequest)).thenReturn(expectedResponse);
 
-        AuthenticationController authenticationController = new AuthenticationController(authService);
-
         CompletableFuture<ResponseEntity<Object>> response = authenticationController.signIn(signInRequest);
 
         assertEquals(HttpStatus.OK, response.get().getStatusCode());
@@ -103,8 +94,6 @@ class AuthenticationControllerTest {
 
     @Test
     void signUp_shouldReturnErrorResponseWhenInvalidRequest() throws Exception {
-        AuthService authService = mock(AuthService.class);
-
         SignUpRequest signUpRequest = new SignUpRequest();
         signUpRequest.setUsername("john_doe");
         signUpRequest.setPassword("Password1!");
@@ -112,8 +101,6 @@ class AuthenticationControllerTest {
         CompletableFuture<ResponseEntity<Object>> expectedResponse =
                 CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid sign up request"));
         when(authService.signUp(signUpRequest)).thenReturn(expectedResponse);
-
-        AuthenticationController authenticationController = new AuthenticationController(authService);
 
         CompletableFuture<ResponseEntity<Object>> response = authenticationController.signUp(signUpRequest);
 

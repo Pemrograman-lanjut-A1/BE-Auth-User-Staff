@@ -13,7 +13,6 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -36,8 +35,6 @@ public class AnnouncementController {
     @PostMapping("/create-announcement")
     public String createAnnouncement(@RequestHeader(value = "Authorization") String token, @RequestBody String jsonContent) throws JSONException {
         if (authenticate(token).equals(NOT_AUTHENTICATED_KEY)){
-
-            System.out.println("masuk sini");
             return FORBIDDEN_MESSAGE;
         }
 

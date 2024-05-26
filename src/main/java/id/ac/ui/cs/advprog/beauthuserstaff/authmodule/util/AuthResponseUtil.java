@@ -43,6 +43,7 @@ public class AuthResponseUtil {
     public static ResponseEntity<Object> generateUserSignUpResponse(User user, JWTservice jwTservice)
             throws ExecutionException, InterruptedException {
         Map<String, Object> userData = new ObjectMapper().convertValue(user, Map.class);
+
         removeUnusedResponse(userData);
 
         if (user.getType().toString().equals(UserType.REGULAR.name())){

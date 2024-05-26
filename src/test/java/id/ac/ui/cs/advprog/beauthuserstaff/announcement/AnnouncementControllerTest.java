@@ -60,7 +60,14 @@ class AnnouncementControllerTest {
     void testCreateAnnouncementForbidden() throws JSONException {
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
         String result = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
-        assertEquals(result,"You are not authorized to make this request");
+        assertEquals("You are not authorized to make this request",result);
+    }
+
+    @Test
+    void testCreateAnnouncementWrongRole() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
+        String result = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+        assertEquals("You are not authorized to make this request",result);
     }
 
     @Test
@@ -74,19 +81,28 @@ class AnnouncementControllerTest {
     void testDeleteAnnouncementForbidden() throws JSONException {
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
         String result = announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
-        assertEquals(result,"You are not authorized to make this request");
+        assertEquals("You are not authorized to make this request", result);
+    }
+
+    @Test
+    void testDeleteAnnouncementWrongRole() throws JSONException {
+        when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
+        String result = announcementController.deleteAnnouncement("token","{\"id\":\"" + "1" + "\"}");
+        assertEquals("You are not authorized to make this request", result);
     }
 
 
     @Test
     void testGetAllAnnouncements() throws JsonProcessingException{
         Announcement announcement1 = new AnnouncementBuilder().content("hello").build();
-        Announcement announcement2 = new AnnouncementBuilder().content("hello").build();
+        Announcement announcement2 = new AnnouncementBuilder().content("hello").title("hello").build();
+        Announcement announcement3 = new AnnouncementBuilder().content("hello").tag("hello").build();
 
         List<Announcement> announcementList = new ArrayList<>();
 
         announcementList.add(announcement1);
         announcementList.add(announcement2);
+        announcementList.add(announcement3);
 
         when(announcementService.getAllAnnouncements()).thenReturn(announcementList);
 

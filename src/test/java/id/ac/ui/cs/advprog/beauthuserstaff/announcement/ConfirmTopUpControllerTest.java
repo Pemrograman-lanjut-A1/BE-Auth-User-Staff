@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.beauthuserstaff.announcement;
 
 import id.ac.ui.cs.advprog.beauthuserstaff.authmodule.config.JwtAuthFilter;
 import id.ac.ui.cs.advprog.beauthuserstaff.controller.staff_dashboard.ConfirmTopUpController;
-import id.ac.ui.cs.advprog.beauthuserstaff.service.StaffDashboardService.ConfirmTopUpService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,8 +25,6 @@ class ConfirmTopUpControllerTest {
     @InjectMocks
     ConfirmTopUpController confirmTopUpController;
 
-    @Mock
-    ConfirmTopUpService confirmTopUpService;
 
     @Mock
     RestTemplate restTemplate;
@@ -47,7 +44,6 @@ class ConfirmTopUpControllerTest {
         when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
         // Stubbing the restTemplate.exchange() method with exact arguments
         when(restTemplate.exchange(
-                //eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
                 eq("http://34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"), // URL
                 eq(HttpMethod.PUT), // HTTP method
                 any(), // Request entity
@@ -60,7 +56,6 @@ class ConfirmTopUpControllerTest {
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
-                //eq("http://localhost:8081/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"),
                 eq("http://34.142.213.219/topup/4e7deb2f-925b-4bbd-8833-14a8ef9cf918/confirm"),
                 eq(HttpMethod.PUT),
                 any(),
@@ -95,7 +90,6 @@ class ConfirmTopUpControllerTest {
     void testGetAllWaitingTopUpsSuccess(){
         when(jwtAuthFilter.filterToken("token")).thenReturn("STAFF");
         when(restTemplate.exchange(
-                //eq("http://localhost:8081/topup/waiting"), // URL
                 eq("http://34.142.213.219/topup/waiting"), // URL
                 eq(HttpMethod.GET), // HTTP method
                 any(), // Request entity
@@ -108,7 +102,6 @@ class ConfirmTopUpControllerTest {
 
         // Verifying that the restTemplate.exchange() method was called with the expected arguments
         verify(restTemplate, times(1)).exchange(
-                //eq("http://localhost:8081/topup/waiting"),
                 eq("http://34.142.213.219/topup/waiting"), // URL
                 eq(HttpMethod.GET),
                 any(),
@@ -118,7 +111,7 @@ class ConfirmTopUpControllerTest {
 
 
     @Test
-    void testGetAllWaitingTopUpsForbidden() throws JSONException {
+    void testGetAllWaitingTopUpsForbidden(){
         when(jwtAuthFilter.filterToken("token")).thenReturn(null);
         ResponseEntity<String> result = confirmTopUpController
                 .getAllWaitingTopUps("token");
@@ -129,7 +122,7 @@ class ConfirmTopUpControllerTest {
     }
 
     @Test
-    void testGetAllWaitingTopUpsWrongRole() throws JSONException {
+    void testGetAllWaitingTopUpsWrongRole(){
         when(jwtAuthFilter.filterToken("token")).thenReturn("USER");
         ResponseEntity<String> result = confirmTopUpController
                 .getAllWaitingTopUps("token");

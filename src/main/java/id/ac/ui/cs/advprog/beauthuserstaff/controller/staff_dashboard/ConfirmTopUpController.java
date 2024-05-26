@@ -51,11 +51,8 @@ public class ConfirmTopUpController {
                     .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
                     .body(FORBIDDEN_MESSAGE);
         }
-        System.out.println("token: " + token);
-        System.out.println("masuk sini");
         JSONObject jsonObject = new JSONObject(jsonContent);
         String id = jsonObject.getString("id");
-        //String confirmUrl = "http://localhost:8081/topup/" + id + "/confirm";
         String confirmUrl = "http" + "://34.142.213.219/topup/" + id + "/confirm";
 
         HttpHeaders headers = new HttpHeaders();
@@ -64,7 +61,6 @@ public class ConfirmTopUpController {
 
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        System.out.println("masuk sini");
         return restTemplate.exchange(
                 confirmUrl, HttpMethod.PUT, requestEntity, String.class);
     }
@@ -76,14 +72,13 @@ public class ConfirmTopUpController {
                     .status(HttpStatus.FORBIDDEN) // Set the status to 403 Forbidden
                     .body(FORBIDDEN_MESSAGE);
         }
-        //String url = "http://localhost:8081/topup/waiting";
+
         String url = "http://" + "34.142.213.219/topup/waiting";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", token);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        System.out.println("masuk sini");
         return restTemplate.exchange(
                 url, HttpMethod.GET, requestEntity, String.class);
     }

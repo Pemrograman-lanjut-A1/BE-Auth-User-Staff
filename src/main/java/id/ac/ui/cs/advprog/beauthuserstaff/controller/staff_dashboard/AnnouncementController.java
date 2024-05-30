@@ -42,6 +42,7 @@ public class AnnouncementController {
         }
 
         JSONObject jsonObject = new JSONObject(jsonContent);
+        System.out.println(jsonObject);
         AnnouncementBuilder announcementBuilder = new AnnouncementBuilder();
         String content = jsonObject.getString("content");
         announcementBuilder.content(content);
@@ -49,11 +50,11 @@ public class AnnouncementController {
             announcementBuilder.tag(jsonObject.getString("tag"));
         }
         if (jsonObject.has("title")) {
-            announcementBuilder.title(jsonObject.getString("title"));
+            announcementBuilder.title(jsonObject.getString("title") +  "Demo Test");
         }
         Announcement newAnnouncement = announcementBuilder.build();
         announcementService.createAnnouncement(newAnnouncement);
-        return SUCCESS_MESSAGE;
+        return newAnnouncement.getTitle();
     }
 
     @PostMapping("/delete-announcement")

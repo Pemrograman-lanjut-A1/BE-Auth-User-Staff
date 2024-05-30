@@ -50,9 +50,10 @@ class AnnouncementControllerTest {
 
 
 
-        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\" }",null, null);
+        Announcement announcement = new Announcement("1", "{\"content\":\"hello\", \"tag\": \"TagTest\", \"title\": \"f\"  }",null, null);
         when(announcementService.createAnnouncement(any())).thenReturn(announcement);
-        announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\" }");
+        String res = announcementController.createAnnouncement( "token","{\"content\":\"hello\", \"tag\": \"TagTest\", \"title\": \"f\"  }");
+        assertEquals("fDemo Test", res);
         verify(announcementService, times(1)).createAnnouncement(any());
     }
 

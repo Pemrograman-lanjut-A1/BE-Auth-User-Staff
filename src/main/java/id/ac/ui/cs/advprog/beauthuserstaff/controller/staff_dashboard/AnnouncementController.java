@@ -50,7 +50,7 @@ public class AnnouncementController {
             announcementBuilder.tag(jsonObject.getString("tag"));
         }
         if (jsonObject.has("title")) {
-            announcementBuilder.title(jsonObject.getString("title") +  "Demo Test");
+            announcementBuilder.title((jsonObject.getString("title")) + "demo test");
         }
         Announcement newAnnouncement = announcementBuilder.build();
         announcementService.createAnnouncement(newAnnouncement);
